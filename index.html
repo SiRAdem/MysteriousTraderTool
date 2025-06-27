@@ -260,7 +260,7 @@ h1 {
   <input id="sell" type="number" placeholder="Sell Price">
   <button id="addBtn">Add Trade</button>
 
-  <p id="stats">Total Trades: 0 | Total Profit: 0 coins</p><p id="streakDisplay">Streak: 🔥 3 profitable trades in a row</p>
+  <p id="stats">Total Trades: 0 | Total Profit: 0 coins</p><p id="streakDisplay">Streak:0 🔥  profitable trades in a row</p>
 
   <input type="text" id="searchInput" placeholder="Search player name..." style="margin-bottom: 10px; padding: 6px; width: 100%; max-width: 400px;">
   <table id="tradeTable">
@@ -803,6 +803,7 @@ let streak = 0;
 trades.forEach(t => {
   if (calcProfit(t.buy, t.sell) > 0) streak++;
   else streak = 0;
+  document.getElementById("streakDisplay").innerHTML="Streak:",streak," 🔥  profitable trades in a row"
 });
 updateGoalProgress(totalProfit);
 updateHighlights(); // 🆕 Add this
