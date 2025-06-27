@@ -260,8 +260,7 @@ h1 {
   <input id="sell" type="number" placeholder="Sell Price">
   <button id="addBtn">Add Trade</button>
 
-  <p id="stats">Total Trades: 0 | Total Profit: 0 coins</p><p id="streakDisplay">Streak:0 🔥  profitable trades in a row</p>
-
+  <p id="streakDisplay">Streaks loading...</p>
   <input type="text" id="searchInput" placeholder="Search player name..." style="margin-bottom: 10px; padding: 6px; width: 100%; max-width: 400px;">
   <table id="tradeTable">
     <thead>
@@ -800,11 +799,25 @@ function animateCounter(el, start, end, duration = 600) {
 }
 
 let streak = 0;
+let highestStreak = localStorage.getItem("highestStreak") || 0;
+
 trades.forEach(t => {
-  if (calcProfit(t.buy, t.sell) > 0) streak++;
-  else streak = 0;
-  document.getElementById("streakDisplay").innerHTML=`Streak: ${streak} 🔥 profitable trades in a row`;
+  if (calcProfit(t.buy, t.sell) > 0) {
+    streak++;
+    if (streak > highestStreak) {
+      highestStreak = streak;
+      localStorage.setItem("highestStreak", highestStreak);
+    }
+  } else {
+    streak = 0;
+  }
 });
+
+document.getElementById("streakDisplay").innerHTML = `
+  Current Streak: ${streak} 🔥<br>
+  Highest Streak: ${highestStreak} 🏆
+`;
+
 updateGoalProgress(totalProfit);
 updateHighlights(); // 🆕 Add this
 function getSmartSuggestions() {
