@@ -803,7 +803,7 @@ let streak = 0;
 trades.forEach(t => {
   if (calcProfit(t.buy, t.sell) > 0) streak++;
   else streak = 0;
-  document.getElementById("streakDisplay").innerHTML="Streak:",streak," 🔥  profitable trades in a row"
+  document.getElementById("streakDisplay").innerHTML=`Streak: ${streak} 🔥 profitable trades in a row`;
 });
 updateGoalProgress(totalProfit);
 updateHighlights(); // 🆕 Add this
