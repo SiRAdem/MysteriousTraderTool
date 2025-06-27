@@ -798,11 +798,14 @@ function animateCounter(el, start, end, duration = 600) {
   requestAnimationFrame(step);
 }
 
+let trades = JSON.parse(localStorage.getItem("trades")) || []; // Or however you're loading trades
+
 let streak = 0;
 let highestStreak = localStorage.getItem("highestStreak") || 0;
 
 trades.forEach(t => {
-  if (calcProfit(t.buy, t.sell) > 0) {
+  const profit = calcProfit(t.buy, t.sell);
+  if (profit > 0) {
     streak++;
     if (streak > highestStreak) {
       highestStreak = streak;
@@ -817,6 +820,7 @@ document.getElementById("streakDisplay").innerHTML = `
   Current Streak: ${streak} 🔥<br>
   Highest Streak: ${highestStreak} 🏆
 `;
+
 
 updateGoalProgress(totalProfit);
 updateHighlights(); // 🆕 Add this
