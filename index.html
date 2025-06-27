@@ -12,45 +12,49 @@
 
   <style>
     body {
-  font-family: 'Rubik', sans-serif;
-  background: linear-gradient(145deg, #0f0f0f, #1f1f1f);
-  color: #fff;
-  padding: 20px;
-  margin: 0;
-}
-#goalProgressWrapper {
-  width: 100%;
-  background: #333;
-  height: 22px;
-  border-radius: 12px;
-  overflow: hidden;
-  margin-top: 10px;
-}
-
-#goalProgress {
-  height: 100%;
-  border-radius: 12px;
-  line-height: 22px;
-  text-align: center;
-  color: #000;
-  font-weight: bold;
-  transition: width 0.4s ease-in-out, background 0.3s ease-in-out;
-  box-shadow: 0 0 10px rgba(0,255,136,0.4);
-}
-.card {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 20px;
-  margin: 20px 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(6px);
-}
-
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(145deg, #0f0f0f, #1f1f1f);
+      color: #fff;
+      padding: 20px;
+      margin: 0;
+    }
+    #goalProgressWrapper {
+      width: 100%;
+      background: #333;
+      height: 22px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    #goalProgress {
+      height: 100%;
+      border-radius: 12px;
+      line-height: 22px;
+      text-align: center;
+      color: #000;
+      font-weight: bold;
+      transition: width 0.4s ease-in-out, background 0.3s ease-in-out;
+      box-shadow: 0 0 10px rgba(0,255,136,0.4);
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(6px);
+    }
     h1 {
       color: #00ff88;
       display: flex;
       align-items: center;
       gap: 10px;
+      position: sticky;
+      top: 0;
+      background: #1a1a1a;
+      z-index: 100;
+      padding: 10px 0;
+      border-bottom: 1px solid #333;
     }
     input {
       margin: 5px;
@@ -59,57 +63,41 @@
       border-radius: 4px;
     }
     button {
-  background: linear-gradient(145deg, #00ff88, #00c96d);
-  color: #000;
-  font-weight: 600;
-  padding: 10px 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 8px rgba(0, 255, 136, 0.2);
-}
-button:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 14px rgba(0, 255, 136, 0.4);
-}
-h1 {
-  color: #00ff88;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: sticky;
-  top: 0;
-  background: #1a1a1a;
-  z-index: 100;
-  padding: 10px 0;
-  border-bottom: 1px solid #333;
-}
-
+      background: linear-gradient(145deg, #00ff88, #00c96d);
+      color: #000;
+      font-weight: 600;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 8px rgba(0, 255, 136, 0.2);
+    }
+    button:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 14px rgba(0, 255, 136, 0.4);
+    }
     #tradeTable {
-  width: 100%;
-  margin-top: 10px;
-  border-collapse: collapse;
-  overflow: hidden;
-  border-radius: 12px;
-}
-
-#tradeTable th, #tradeTable td {
-  padding: 10px;
-  border: 1px solid #444;
-  text-align: center;
-}
-  #tradeTable thead {
-  background-color: #00ff8833;
-}
-
-#tradeTable tbody tr:nth-child(even) {
-  background-color: #2a2a2a;
-}
-
-#tradeTable tbody tr:hover {
-  background-color: #333;
-}
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    #tradeTable th, #tradeTable td {
+      padding: 10px;
+      border: 1px solid #444;
+      text-align: center;
+    }
+    #tradeTable thead {
+      background-color: #00ff8833;
+    }
+    #tradeTable tbody tr:nth-child(even) {
+      background-color: #2a2a2a;
+    }
+    #tradeTable tbody tr:hover {
+      background-color: #333;
+    }
     #logo {
       width: 40px;
       height: 40px;
@@ -121,100 +109,92 @@ h1 {
       filter: brightness(1.2);
     }
     #tabSwitcher {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-}
-
-.tabBtn {
-  background: #222;
-  color: #00ff88;
-  border: 1px solid #00ff88;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.tabBtn.active {
-  background: #00ff88;
-  color: #000;
-  font-weight: bold;
-  box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
-}
-
-.tabBtn:hover {
-  transform: scale(1.05);
-}
-#auth-section {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  text-align: right;
-}
-
-#auth-section button {
-  margin-left: 10px;
-  background: #1a1a1a;
-  color: #00ff88;
-  border: 1px solid #00ff88;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s ease;
-}
-
-#auth-section button:hover {
-  background: #00ff88;
-  color: #000;
-  transform: scale(1.05);
-}
-
-#user-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-#user-email {
-  font-size: 0.9rem;
-  color: #aaa;
-  margin: 0;
-}
-.highlight-card {
-  flex: 1;
-  min-width: 180px;
-  background: rgba(255, 255, 255, 0.06);
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.1);
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.highlight-card.best {
-  border-left: 5px solid #00ff88;
-}
-.highlight-card.worst {
-  border-left: 5px solid #e74c3c;
-}
-
-.highlight-card h3 {
-  margin-bottom: 10px;
-  font-size: 1.2em;
-}
-
-.highlight-card.animate {
-  transform: scale(1.05);
-  box-shadow: 0 0 18px rgba(0, 255, 136, 0.4);
-}
-
-.highlight-card.worst.animate {
-  box-shadow: 0 0 18px rgba(231, 76, 60, 0.4);
-}
-
-
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .tabBtn {
+      background: #222;
+      color: #00ff88;
+      border: 1px solid #00ff88;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .tabBtn.active {
+      background: #00ff88;
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+    }
+    .tabBtn:hover {
+      transform: scale(1.05);
+    }
+    #auth-section {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      text-align: right;
+    }
+    #auth-section button {
+      margin-left: 10px;
+      background: #1a1a1a;
+      color: #00ff88;
+      border: 1px solid #00ff88;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+    #auth-section button:hover {
+      background: #00ff88;
+      color: #000;
+      transform: scale(1.05);
+    }
+    #user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #user-email {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin: 0;
+    }
+    .highlight-card {
+      flex: 1;
+      min-width: 180px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 255, 136, 0.1);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .highlight-card.best {
+      border-left: 5px solid #00ff88;
+    }
+    .highlight-card.worst {
+      border-left: 5px solid #e74c3c;
+    }
+    .highlight-card h3 {
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    .highlight-card.animate {
+      transform: scale(1.05);
+      box-shadow: 0 0 18px rgba(0, 255, 136, 0.4);
+    }
+    .highlight-card.worst.animate {
+      box-shadow: 0 0 18px rgba(231, 76, 60, 0.4);
+    }
+    #stats {
+      margin: 8px 0;
+      font-size: 1.1em;
+      color: #00ff88;
+    }
   </style>
 </head>
 <body>
@@ -227,8 +207,6 @@ h1 {
   <button id="showTradeBtn" class="tabBtn active">🧾 Trade Tracker</button>
   <button id="showAnalyticsBtn" class="tabBtn">📊 Analytics</button>
 </div>
-
-
 
 <div id="auth-section">
   <div id="user-info">
@@ -262,6 +240,7 @@ h1 {
 
   <p id="streakDisplay">Streaks loading...</p>
   <input type="text" id="searchInput" placeholder="Search player name..." style="margin-bottom: 10px; padding: 6px; width: 100%; max-width: 400px;">
+  <div id="stats"></div>
   <table id="tradeTable">
     <thead>
       <tr><th>Player</th><th>Rating</th><th>Buy</th><th>Sell</th><th>Profit</th><th>Note</th><th>action</th></tr>
@@ -276,7 +255,6 @@ h1 {
   <h2>📊 Monthly Profit Analytics</h2>
   <canvas id="monthlyChart" width="400" height="200"></canvas>
 </div>
-</div>
 <section id="suggestionsSection" style="margin:20px; padding:10px; background:#121212; border-radius:8px; color:#eee;">
   <h2>💡 Smart Suggestions</h2>
   <div id="suggestionsList"></div>
@@ -288,17 +266,12 @@ h1 {
   <button id="setGoalBtn">Save Goal</button>
   <p id="goalStatus">Current Goal: -</p>
   <div id="goalProgressWrapper">
-  <div id="goalProgress">0%</div>
+    <div id="goalProgress">0%</div>
+  </div>
 </div>
-  
-
-  
-
-</div>
-
 
 <script>
-
+  // ---- Init Firebase ----
   const firebaseConfig = {
     apiKey: "AIzaSyBH9OtMF64mpkrWCHWH4fUr7FzELGlqiD8",
     authDomain: "mysterioustradertool.firebaseapp.com",
@@ -307,27 +280,18 @@ h1 {
     messagingSenderId: "208262367037",
     appId: "1:208262367037:web:feabcfd9b74dec6eb36754"
   };
-
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  // ---- Globals ----
   let trades = [];
   let userId = null;
   let chart;
-let profitGoal = null;
-let goalReached = false;
+  let profitGoal = null;
+  let goalReached = false;
 
-
-document.getElementById("setGoalBtn").onclick = () => {
-  const input = parseInt(document.getElementById("profitGoalInput").value);
-  if (isNaN(input) || input <= 0) return alert("Enter a valid positive number.");
-  profitGoal = input;
-  document.getElementById("goalStatus").textContent = `Current Goal: ${profitGoal} coins`;
-  saveTradesToDB();
-};
-
-
+  // ---- Helper Functions ----
   function calcProfit(buy, sell) {
     return Math.round(sell * 0.95 - buy);
   }
@@ -339,128 +303,114 @@ document.getElementById("setGoalBtn").onclick = () => {
   }
 
   function updateTable() {
-  const PROFIT_HIGHLIGHT_THRESHOLD = 10000;
-  const tbody = document.querySelector("#tradeTable tbody");
-  tbody.innerHTML = "";
-  let totalProfit = 0;
+    const PROFIT_HIGHLIGHT_THRESHOLD = 10000;
+    const tbody = document.querySelector("#tradeTable tbody");
+    tbody.innerHTML = "";
+    let totalProfit = 0;
 
-  trades.forEach((t, i) => {
-    const profit = calcProfit(t.buy, t.sell);
-    totalProfit += profit;
-    const row = `<tr>
-      <td>${t.player}</td>
-      <td>${t.rating || "-"}</td>
-      <td>${t.buy}</td>
-      <td>${t.sell}</td>
-      <td style="color:${profit >= 0 ? '#2ecc71' : '#e74c3c'}; font-weight: ${profit >= PROFIT_HIGHLIGHT_THRESHOLD ? 'bold' : 'normal'}">
-        ${profit}
-      </td>
-      <td>${getNote(profit)}</td>
-      <td>
-        <button class="modifyBtn" data-index="${i}">✏️ Modify</button>
-        <button class="deleteBtn" data-index="${i}">❌ Delete</button>
-      </td>
-    </tr>`;
-    tbody.innerHTML += row;
-  });
-
-  document.getElementById("stats").innerText =
-    `Total Trades: ${trades.length} | Total Profit: ${totalProfit} coins`;
-
-  updateGoalProgress(totalProfit);
-
-  // Attach Delete Button Events
-  document.querySelectorAll(".deleteBtn").forEach(btn => {
-    btn.onclick = () => {
-      const idx = parseInt(btn.dataset.index);
-      trades.splice(idx, 1);
-      saveTradesToDB();
-      updateTable();
-      updateChart();
-      updateMonthlyChart();
-    };
-  });
-
-  // Attach Modify Button Events
-  document.querySelectorAll(".modifyBtn").forEach(btn => {
-    btn.onclick = () => {
-      const idx = parseInt(btn.dataset.index);
-      const trade = trades[idx];
-
-      document.getElementById("player").value = trade.player;
-      document.getElementById("buy").value = trade.buy;
-      document.getElementById("sell").value = trade.sell;
-      document.getElementById("playerRating").value = trade.rating || "";
-
-      const addBtn = document.getElementById("addBtn");
-      addBtn.textContent = "Save Changes";
-      addBtn.dataset.editingIndex = idx;
-    };
-  });
-
-  // Also update stats average & best/worst in stats text (optional)
-  const avgProfit = trades.length ? Math.round(totalProfit / trades.length) : 0;
-  document.getElementById("stats").innerText += ` | Avg Profit: ${avgProfit} coins`;
-
-  if (trades.length) {
-    let max = trades[0];
-    let min = trades[0];
-
-    trades.forEach(t => {
-      if (calcProfit(t.buy, t.sell) > calcProfit(max.buy, max.sell)) max = t;
-      if (calcProfit(t.buy, t.sell) < calcProfit(min.buy, min.sell)) min = t;
+    trades.forEach((t, i) => {
+      const profit = calcProfit(t.buy, t.sell);
+      totalProfit += profit;
+      const row = `<tr>
+        <td>${t.player}</td>
+        <td>${t.rating || "-"}</td>
+        <td>${t.buy}</td>
+        <td>${t.sell}</td>
+        <td style="color:${profit >= 0 ? '#2ecc71' : '#e74c3c'}; font-weight: ${profit >= PROFIT_HIGHLIGHT_THRESHOLD ? 'bold' : 'normal'}">
+          ${profit}
+        </td>
+        <td>${getNote(profit)}</td>
+        <td>
+          <button class="modifyBtn" data-index="${i}">✏️ Modify</button>
+          <button class="deleteBtn" data-index="${i}">❌ Delete</button>
+        </td>
+      </tr>`;
+      tbody.innerHTML += row;
     });
 
-    document.getElementById("stats").innerText += 
-      ` | Best: ${max.player} (${calcProfit(max.buy, max.sell)}🪙) | Worst: ${min.player} (${calcProfit(min.buy, min.sell)}🪙)`;
+    let avgProfit = trades.length ? Math.round(totalProfit / trades.length) : 0;
+    let stats = `Total Trades: ${trades.length} | Total Profit: ${totalProfit} coins | Avg Profit: ${avgProfit} coins`;
+    if (trades.length) {
+      let max = trades[0];
+      let min = trades[0];
+      trades.forEach(t => {
+        if (calcProfit(t.buy, t.sell) > calcProfit(max.buy, max.sell)) max = t;
+        if (calcProfit(t.buy, t.sell) < calcProfit(min.buy, min.sell)) min = t;
+      });
+      stats += ` | Best: ${max.player} (${calcProfit(max.buy, max.sell)}🪙) | Worst: ${min.player} (${calcProfit(min.buy, min.sell)}🪙)`;
+    }
+    document.getElementById("stats").innerText = stats;
+
+    updateGoalProgress(totalProfit);
+    updateHighlights();
+
+    // Attach Delete Button Events
+    document.querySelectorAll(".deleteBtn").forEach(btn => {
+      btn.onclick = () => {
+        const idx = parseInt(btn.dataset.index);
+        trades.splice(idx, 1);
+        saveTradesToDB();
+        updateTable();
+        updateChart();
+        updateMonthlyChart();
+        updateSuggestionsUI();
+      };
+    });
+
+    // Attach Modify Button Events
+    document.querySelectorAll(".modifyBtn").forEach(btn => {
+      btn.onclick = () => {
+        const idx = parseInt(btn.dataset.index);
+        const trade = trades[idx];
+        document.getElementById("player").value = trade.player;
+        document.getElementById("buy").value = trade.buy;
+        document.getElementById("sell").value = trade.sell;
+        document.getElementById("playerRating").value = trade.rating || "";
+        const addBtn = document.getElementById("addBtn");
+        addBtn.textContent = "Save Changes";
+        addBtn.dataset.editingIndex = idx;
+      };
+    });
   }
 
-  updateHighlights();  // CALL it here so it runs on every table update
-}
+  function updateHighlights() {
+    if (!trades.length) return;
 
-// Move updateHighlights() OUTSIDE updateTable(), like this:
-function updateHighlights() {
-  if (!trades.length) return;
+    let best = trades[0];
+    let worst = trades[0];
 
-  let best = trades[0];
-  let worst = trades[0];
+    trades.forEach(t => {
+      if (calcProfit(t.buy, t.sell) > calcProfit(best.buy, best.sell)) best = t;
+      if (calcProfit(t.buy, t.sell) < calcProfit(worst.buy, worst.sell)) worst = t;
+    });
 
-  trades.forEach(t => {
-    if (calcProfit(t.buy, t.sell) > calcProfit(best.buy, best.sell)) best = t;
-    if (calcProfit(t.buy, t.sell) < calcProfit(worst.buy, worst.sell)) worst = t;
-  });
+    const bestProfit = calcProfit(best.buy, best.sell);
+    const worstProfit = calcProfit(worst.buy, worst.sell);
 
-  const bestProfit = calcProfit(best.buy, best.sell);
-  const worstProfit = calcProfit(worst.buy, worst.sell);
+    const bestCard = document.querySelector(".highlight-card.best");
+    const worstCard = document.querySelector(".highlight-card.worst");
 
-  const bestCard = document.querySelector(".highlight-card.best");
-  const worstCard = document.querySelector(".highlight-card.worst");
+    if (!bestCard || !worstCard) return;
 
-  if (!bestCard || !worstCard) return;  // safety check
+    document.getElementById("bestPlayer").textContent = best.player;
+    document.getElementById("bestProfit").textContent = `+${bestProfit} 🪙`;
+    document.getElementById("bestDate").textContent = best.date ? new Date(best.date).toLocaleDateString() : "-";
 
-  document.getElementById("bestPlayer").textContent = best.player;
-  document.getElementById("bestProfit").textContent = `+${bestProfit} 🪙`;
-  document.getElementById("bestDate").textContent = best.date ? new Date(best.date).toLocaleDateString() : "-";
+    document.getElementById("worstPlayer").textContent = worst.player;
+    document.getElementById("worstProfit").textContent = `${worstProfit} 🪙`;
+    document.getElementById("worstDate").textContent = worst.date ? new Date(worst.date).toLocaleDateString() : "-";
 
-  document.getElementById("worstPlayer").textContent = worst.player;
-  document.getElementById("worstProfit").textContent = `${worstProfit} 🪙`;
-  document.getElementById("worstDate").textContent = worst.date ? new Date(worst.date).toLocaleDateString() : "-";
-
-  // Animate if new records
-  if (bestProfit > (window.lastBestProfit || -Infinity)) {
-    bestCard.classList.add("animate");
-    setTimeout(() => bestCard.classList.remove("animate"), 1000);
-    window.lastBestProfit = bestProfit;
+    if (bestProfit > (window.lastBestProfit || -Infinity)) {
+      bestCard.classList.add("animate");
+      setTimeout(() => bestCard.classList.remove("animate"), 1000);
+      window.lastBestProfit = bestProfit;
+    }
+    if (worstProfit < (window.lastWorstProfit || Infinity)) {
+      worstCard.classList.add("animate");
+      setTimeout(() => worstCard.classList.remove("animate"), 1000);
+      window.lastWorstProfit = worstProfit;
+    }
   }
-
-  if (worstProfit < (window.lastWorstProfit || Infinity)) {
-    worstCard.classList.add("animate");
-    setTimeout(() => worstCard.classList.remove("animate"), 1000);
-    window.lastWorstProfit = worstProfit;
-  }
-}
-
-
 
   function updateChart() {
     const ctx = document.getElementById("profitChart").getContext("2d");
@@ -472,7 +422,7 @@ function updateHighlights() {
     chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: labels,
+        labels,
         datasets: [{
           label: 'Profit per Trade',
           data: profits,
@@ -500,116 +450,115 @@ function updateHighlights() {
       }
     });
   }
+
   function updateMonthlyChart() {
-  const ctx = document.getElementById("monthlyChart").getContext("2d");
+    const ctx = document.getElementById("monthlyChart").getContext("2d");
+    const monthlyData = {};
+    trades.forEach(t => {
+      const profit = calcProfit(t.buy, t.sell);
+      const date = t.date ? new Date(t.date) : new Date();
+      const key = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+      if (!monthlyData[key]) monthlyData[key] = 0;
+      monthlyData[key] += profit;
+    });
+    const labels = Object.keys(monthlyData);
+    const data = Object.values(monthlyData);
 
-  // Group profits by month
-  const monthlyData = {};
-  trades.forEach(t => {
-    const profit = calcProfit(t.buy, t.sell);
-    const date = t.date ? new Date(t.date) : new Date(); // Fallback if no date
-    const key = date.toLocaleString('default', { month: 'short', year: 'numeric' });
-
-    if (!monthlyData[key]) monthlyData[key] = 0;
-    monthlyData[key] += profit;
-  });
-
-  const labels = Object.keys(monthlyData);
-  const data = Object.values(monthlyData);
-
-  if (window.monthlyChart && typeof window.monthlyChart.destroy === 'function') {
-  window.monthlyChart.destroy();
-}
-;
-
-  window.monthlyChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Monthly Profit',
-        data: data,
-        backgroundColor: data.map(p => p >= 0 ? '#00ff88' : '#e74c3c'),
-        borderRadius: 4
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: val => val + ' 🪙'
-          }
-        }
+    if (window.monthlyChart && typeof window.monthlyChart.destroy === 'function') {
+      window.monthlyChart.destroy();
+    }
+    window.monthlyChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Monthly Profit',
+          data,
+          backgroundColor: data.map(p => p >= 0 ? '#00ff88' : '#e74c3c'),
+          borderRadius: 4
+        }]
       },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => `Profit: ${ctx.parsed.y} coins`
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: val => val + ' 🪙'
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `Profit: ${ctx.parsed.y} coins`
+            }
           }
         }
       }
-    }
-  });
-}
-
+    });
+  }
 
   function saveTradesToDB() {
     if (!userId) return;
-db.collection("users").doc(userId).set({ trades, profitGoal });
+    db.collection("users").doc(userId).set({ trades, profitGoal });
   }
 
   function loadTradesFromDB() {
     db.collection("users").doc(userId).get().then(doc => {
       if (doc.exists) {
         const data = doc.data();
-trades = data.trades || [];
-profitGoal = data.profitGoal || null;
-document.getElementById("goalStatus").textContent = 
-  `Current Goal: ${profitGoal ? profitGoal + " coins" : "-"}`;
-
+        trades = data.trades || [];
+        profitGoal = data.profitGoal || null;
+        document.getElementById("goalStatus").textContent =
+          `Current Goal: ${profitGoal ? profitGoal + " coins" : "-"}`;
       } else {
         trades = [];
       }
       updateTable();
       updateChart();
+      updateMonthlyChart();
+      updateSuggestionsUI();
+      updateStreaks();
     });
   }
 
   document.getElementById("addBtn").onclick = () => {
-  const player = document.getElementById("player").value.trim();
-  const buy = parseInt(document.getElementById("buy").value);
-  const sell = parseInt(document.getElementById("sell").value);
-  const ratingInput = document.getElementById("playerRating").value;
-const rating = ratingInput ? parseInt(ratingInput) : null;
+    const player = document.getElementById("player").value.trim();
+    const buy = parseInt(document.getElementById("buy").value);
+    const sell = parseInt(document.getElementById("sell").value);
+    const ratingInput = document.getElementById("playerRating").value;
+    const rating = ratingInput ? parseInt(ratingInput) : null;
+    if (!player || isNaN(buy) || isNaN(sell)) return alert("Please fill all fields");
+    const editingIndex = document.getElementById("addBtn").dataset.editingIndex;
+    if (editingIndex !== undefined) {
+      trades[editingIndex] = { player, buy, sell, rating, date: trades[editingIndex].date || new Date().toISOString() };
+      delete document.getElementById("addBtn").dataset.editingIndex;
+      document.getElementById("addBtn").textContent = "Add Trade";
+    } else {
+      trades.push({ player, buy, sell, rating, date: new Date().toISOString() });
+    }
+    saveTradesToDB();
+    updateTable();
+    updateChart();
+    updateMonthlyChart();
+    updateSuggestionsUI();
+    updateStreaks();
+    document.getElementById("player").value = "";
+    document.getElementById("buy").value = "";
+    document.getElementById("sell").value = "";
+    document.getElementById("playerRating").value = "";
+  };
 
-  if (!player || isNaN(buy) || isNaN(sell)) return alert("Please fill all fields");
-
-  const editingIndex = document.getElementById("addBtn").dataset.editingIndex;
-
-  if (editingIndex !== undefined) {
-    // Save changes to existing trade
-    trades[editingIndex] = { player, buy, sell, rating, date: trades[editingIndex].date || new Date().toISOString() };
-    delete document.getElementById("addBtn").dataset.editingIndex;
-    document.getElementById("addBtn").textContent = "Add Trade";
-  } else {
-    // Add new trade
-    trades.push({ player, buy, sell, rating, date: new Date().toISOString() });
-  }
-
-  saveTradesToDB();
-  updateTable();
-  updateChart();
-  updateMonthlyChart();
-
-  // Clear inputs and rating display
-  document.getElementById("player").value = "";
-  document.getElementById("buy").value = "";
-  document.getElementById("sell").value = "";
-  document.getElementById("playerRating").value = "Rating: -";
-};
-
+  document.getElementById("setGoalBtn").onclick = () => {
+    const input = parseInt(document.getElementById("profitGoalInput").value);
+    if (isNaN(input) || input <= 0) return alert("Enter a valid positive number.");
+    profitGoal = input;
+    document.getElementById("goalStatus").textContent = `Current Goal: ${profitGoal} coins`;
+    saveTradesToDB();
+    updateTable();
+    updateGoalProgress(trades.reduce((sum, t) => sum + calcProfit(t.buy, t.sell), 0));
+  };
 
   document.getElementById("loginBtn").addEventListener("click", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -634,262 +583,234 @@ const rating = ratingInput ? parseInt(ratingInput) : null;
       trades = [];
       updateTable();
       updateChart();
+      updateMonthlyChart();
+      updateSuggestionsUI();
+      updateStreaks();
       document.getElementById("user-email").textContent = "";
       document.getElementById("loginBtn").style.display = "inline-block";
       document.getElementById("logoutBtn").style.display = "none";
     }
   });
+
   function switchTab(showTrade) {
-  const tradeSection = document.getElementById("tradeSection");
-  const analyticsSection = document.getElementById("analyticsSection");
-
-  if (showTrade) {
-    tradeSection.style.display = "block";
-    analyticsSection.style.display = "none";
-    document.getElementById("showTradeBtn").classList.add("active");
-    document.getElementById("showAnalyticsBtn").classList.remove("active");
-  } else {
-    tradeSection.style.display = "none";
-    analyticsSection.style.display = "block";
-    document.getElementById("showTradeBtn").classList.remove("active");
-    document.getElementById("showAnalyticsBtn").classList.add("active");
-    updateMonthlyChart();
+    const tradeSection = document.getElementById("tradeSection");
+    const analyticsSection = document.getElementById("analyticsSection");
+    if (showTrade) {
+      tradeSection.style.display = "block";
+      analyticsSection.style.display = "none";
+      document.getElementById("showTradeBtn").classList.add("active");
+      document.getElementById("showAnalyticsBtn").classList.remove("active");
+    } else {
+      tradeSection.style.display = "none";
+      analyticsSection.style.display = "block";
+      document.getElementById("showTradeBtn").classList.remove("active");
+      document.getElementById("showAnalyticsBtn").classList.add("active");
+      updateMonthlyChart();
+    }
   }
-}
 
-document.getElementById("showTradeBtn").addEventListener("click", () => switchTab(true));
-document.getElementById("showAnalyticsBtn").addEventListener("click", () => switchTab(false));
+  document.getElementById("showTradeBtn").addEventListener("click", () => switchTab(true));
+  document.getElementById("showAnalyticsBtn").addEventListener("click", () => switchTab(false));
 
-let filteredTrades = [];
+  let filteredTrades = [];
 
-document.getElementById("searchInput").addEventListener("input", (e) => {
-  const searchTerm = e.target.value.toLowerCase();
-
-  filteredTrades = trades.filter(t => t.player.toLowerCase().includes(searchTerm));
-  updateFilteredTable(filteredTrades);
-  updateFilteredChart(filteredTrades);
-});
-
-function updateFilteredTable(list) {
-  const tbody = document.querySelector("#tradeTable tbody");
-  tbody.innerHTML = "";
-  let totalProfit = 0;
-
-  list.forEach((t, i) => {
-    const profit = calcProfit(t.buy, t.sell);
-    totalProfit += profit;
-    const row = `<tr>
-      <td>${t.player}</td>
-      <td>${t.buy}</td>
-      <td>${t.sell}</td>
-      <td style="color:${profit >= 0 ? '#2ecc71' : '#e74c3c'}">${profit}</td>
-      <td>${getNote(profit)}</td>
-      <td><button class="deleteBtn" data-index="${i}">❌ Delete</button></td>
-    </tr>`;
-    tbody.innerHTML += row;
+  document.getElementById("searchInput").addEventListener("input", (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    filteredTrades = trades.filter(t => t.player.toLowerCase().includes(searchTerm));
+    updateFilteredTable(filteredTrades);
+    updateFilteredChart(filteredTrades);
   });
 
-  document.getElementById("stats").innerText =
-    `Total Trades: ${list.length} | Total Profit: ${totalProfit} coins`;
+  function updateFilteredTable(list) {
+    const tbody = document.querySelector("#tradeTable tbody");
+    tbody.innerHTML = "";
+    let totalProfit = 0;
 
-  document.querySelectorAll(".deleteBtn").forEach(btn => {
-    btn.onclick = () => {
-      const idx = parseInt(btn.getAttribute("data-index"));
-      // Find the actual index in trades array
-      const actualTradeIndex = trades.findIndex(t => t === list[idx]);
-      if (actualTradeIndex > -1) {
-        trades.splice(actualTradeIndex, 1);
-        saveTradesToDB();
-        // After deleting, reset search input and filteredTrades
-        document.getElementById("searchInput").value = "";
-        filteredTrades = [];
-        updateTable();
-        updateChart();
-      }
-    };
-  });
-}
+    list.forEach((t, i) => {
+      const profit = calcProfit(t.buy, t.sell);
+      totalProfit += profit;
+      const row = `<tr>
+        <td>${t.player}</td>
+        <td>${t.rating || "-"}</td>
+        <td>${t.buy}</td>
+        <td>${t.sell}</td>
+        <td style="color:${profit >= 0 ? '#2ecc71' : '#e74c3c'}">${profit}</td>
+        <td>${getNote(profit)}</td>
+        <td><button class="deleteBtn" data-index="${i}">❌ Delete</button></td>
+      </tr>`;
+      tbody.innerHTML += row;
+    });
 
-function updateFilteredChart(list) {
-  const ctx = document.getElementById("profitChart").getContext("2d");
+    document.getElementById("stats").innerText =
+      `Total Trades: ${list.length} | Total Profit: ${totalProfit} coins`;
 
-  const labels = list.map((t, i) => `${i + 1}. ${t.player}`);
-  const profits = list.map(t => calcProfit(t.buy, t.sell));
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Profit per Trade',
-        data: profits,
-        borderColor: '#00ff88',
-        backgroundColor: 'rgba(0,255,136,0.1)',
-        pointBackgroundColor: profits.map(p => p >= 0 ? '#2ecc71' : '#e74c3c'),
-        tension: 0.3
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { callback: val => val + ' 🪙' }
+    document.querySelectorAll(".deleteBtn").forEach(btn => {
+      btn.onclick = () => {
+        const idx = parseInt(btn.getAttribute("data-index"));
+        const actualTradeIndex = trades.findIndex(t => t === list[idx]);
+        if (actualTradeIndex > -1) {
+          trades.splice(actualTradeIndex, 1);
+          saveTradesToDB();
+          document.getElementById("searchInput").value = "";
+          filteredTrades = [];
+          updateTable();
+          updateChart();
+          updateMonthlyChart();
+          updateSuggestionsUI();
+          updateStreaks();
         }
+      };
+    });
+  }
+
+  function updateFilteredChart(list) {
+    const ctx = document.getElementById("profitChart").getContext("2d");
+    const labels = list.map((t, i) => `${i + 1}. ${t.player}`);
+    const profits = list.map(t => calcProfit(t.buy, t.sell));
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Profit per Trade',
+          data: profits,
+          borderColor: '#00ff88',
+          backgroundColor: 'rgba(0,255,136,0.1)',
+          pointBackgroundColor: profits.map(p => p >= 0 ? '#2ecc71' : '#e74c3c'),
+          tension: 0.3
+        }]
       },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => `Profit: ${ctx.parsed.y} coins`
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { callback: val => val + ' 🪙' }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `Profit: ${ctx.parsed.y} coins`
+            }
           }
         }
       }
-    }
-  });
-}
-function updateGoalProgress(totalProfit) {
-  const progressBar = document.getElementById("goalProgress");
-
-  if (!profitGoal || profitGoal <= 0) {
-    progressBar.style.width = "0%";
-    progressBar.textContent = "No Goal Set";
-    progressBar.style.background = "#555";
-    goalReached = false;
-    return;
+    });
   }
 
-  const percent = Math.min(100, Math.round((totalProfit / profitGoal) * 100));
-  progressBar.style.width = percent + "%";
-  progressBar.textContent = percent + "%";
-
-  if (percent >= 100) {
-    progressBar.style.background = "#00ff88"; // Green
-    if (!goalReached) {
-      goalReached = true;
-      alert("🎉 Goal Achieved! You’ve reached your monthly profit target!");
+  function updateGoalProgress(totalProfit) {
+    const progressBar = document.getElementById("goalProgress");
+    if (!profitGoal || profitGoal <= 0) {
+      progressBar.style.width = "0%";
+      progressBar.textContent = "No Goal Set";
+      progressBar.style.background = "#555";
+      goalReached = false;
+      return;
     }
-  } else if (percent >= 50) {
-    progressBar.style.background = "orange";
-    goalReached = false;
-  } else {
-    progressBar.style.background = "#e74c3c";
-    goalReached = false;
-  }
-}
-function animateCounter(el, start, end, duration = 600) {
-  const range = end - start;
-  let startTime = null;
-
-  function step(timestamp) {
-    if (!startTime) startTime = timestamp;
-    const progress = timestamp - startTime;
-    const value = Math.round(start + (range * (progress / duration)));
-    el.textContent = `Total Trades: ${trades.length} | Total Profit: ${value} coins`;
-
-    if (progress < duration) {
-      requestAnimationFrame(step);
+    const percent = Math.min(100, Math.round((totalProfit / profitGoal) * 100));
+    progressBar.style.width = percent + "%";
+    progressBar.textContent = percent + "%";
+    if (percent >= 100) {
+      progressBar.style.background = "#00ff88";
+      if (!goalReached) {
+        goalReached = true;
+        alert("🎉 Goal Achieved! You’ve reached your monthly profit target!");
+      }
+    } else if (percent >= 50) {
+      progressBar.style.background = "orange";
+      goalReached = false;
     } else {
-      el.textContent = `Total Trades: ${trades.length} | Total Profit: ${end} coins`;
+      progressBar.style.background = "#e74c3c";
+      goalReached = false;
     }
   }
 
-  requestAnimationFrame(step);
-}
+  function getSmartSuggestions() {
+    if (!trades.length) return [];
 
-let trades = JSON.parse(localStorage.getItem("trades")) || []; // Or however you're loading trades
+    const playerStats = {};
+    trades.forEach(t => {
+      const profit = calcProfit(t.buy, t.sell);
+      if (!playerStats[t.player]) {
+        playerStats[t.player] = {
+          player: t.player,
+          totalBuy: 0,
+          totalSell: 0,
+          tradeCount: 0,
+          totalProfit: 0,
+        };
+      }
+      playerStats[t.player].totalBuy += t.buy;
+      playerStats[t.player].totalSell += t.sell;
+      playerStats[t.player].tradeCount++;
+      playerStats[t.player].totalProfit += profit;
+    });
 
-let streak = 0;
-let highestStreak = localStorage.getItem("highestStreak") || 0;
+    const suggestions = Object.values(playerStats).map(p => {
+      const avgBuy = Math.round(p.totalBuy / p.tradeCount);
+      const avgSell = Math.round(p.totalSell / p.tradeCount);
+      const avgProfit = Math.round(p.totalProfit / p.tradeCount);
 
-trades.forEach(t => {
-  const profit = calcProfit(t.buy, t.sell);
-  if (profit > 0) {
-    streak++;
-    if (streak > highestStreak) {
-      highestStreak = streak;
-      localStorage.setItem("highestStreak", highestStreak);
-    }
-  } else {
-    streak = 0;
-  }
-});
-
-document.getElementById("streakDisplay").innerHTML = `
-  Current Streak: ${streak} 🔥<br>
-  Highest Streak: ${highestStreak} 🏆
-`;
-
-
-updateGoalProgress(totalProfit);
-updateHighlights(); // 🆕 Add this
-function getSmartSuggestions() {
-  if (!trades.length) return [];
-
-  // Group trades by player
-  const playerStats = {};
-
-  trades.forEach(t => {
-    const profit = calcProfit(t.buy, t.sell);
-    if (!playerStats[t.player]) {
-      playerStats[t.player] = {
-        player: t.player,
-        totalBuy: 0,
-        totalSell: 0,
-        tradeCount: 0,
-        totalProfit: 0,
+      return {
+        player: p.player,
+        avgBuy,
+        avgSell,
+        avgProfit,
+        suggestion: avgProfit > 0
+          ? `Consider buying around ${avgBuy} 🪙 and selling near ${avgSell} 🪙`
+          : `Be cautious trading this player, average profit is negative`,
       };
-    }
-    playerStats[t.player].totalBuy += t.buy;
-    playerStats[t.player].totalSell += t.sell;
-    playerStats[t.player].tradeCount++;
-    playerStats[t.player].totalProfit += profit;
-  });
+    });
 
-  // Calculate averages and prepare suggestions
-  const suggestions = Object.values(playerStats).map(p => {
-    const avgBuy = Math.round(p.totalBuy / p.tradeCount);
-    const avgSell = Math.round(p.totalSell / p.tradeCount);
-    const avgProfit = Math.round(p.totalProfit / p.tradeCount);
-
-    return {
-      player: p.player,
-      avgBuy,
-      avgSell,
-      avgProfit,
-      suggestion: avgProfit > 0
-        ? `Consider buying around ${avgBuy} 🪙 and selling near ${avgSell} 🪙`
-        : `Be cautious trading this player, average profit is negative`,
-    };
-  });
-
-  // Sort suggestions by avgProfit desc so best suggestions are on top
-  suggestions.sort((a, b) => b.avgProfit - a.avgProfit);
-
-  return suggestions;
-}
-function updateSuggestionsUI() {
-  const suggestions = getSmartSuggestions();
-  const container = document.getElementById("suggestionsList");
-
-  if (!suggestions.length) {
-    container.innerHTML = "<p>No suggestions available yet. Add some trades first!</p>";
-    return;
+    suggestions.sort((a, b) => b.avgProfit - a.avgProfit);
+    return suggestions;
   }
 
-  container.innerHTML = suggestions.map(s => `
-    <div style="padding:10px; margin-bottom:8px; background:#222; border-radius:6px;">
-      <strong>${s.player}</strong><br>
-      <em>${s.suggestion}</em><br>
-      <small>Avg Profit: ${s.avgProfit} 🪙</small>
-    </div>
-  `).join("");
-}
-updateSuggestionsUI();
+  function updateSuggestionsUI() {
+    const suggestions = getSmartSuggestions();
+    const container = document.getElementById("suggestionsList");
+    if (!suggestions.length) {
+      container.innerHTML = "<p>No suggestions available yet. Add some trades first!</p>";
+      return;
+    }
+    container.innerHTML = suggestions.map(s => `
+      <div style="padding:10px; margin-bottom:8px; background:#222; border-radius:6px;">
+        <strong>${s.player}</strong><br>
+        <em>${s.suggestion}</em><br>
+        <small>Avg Profit: ${s.avgProfit} 🪙</small>
+      </div>
+    `).join("");
+  }
 
+  function updateStreaks() {
+    let streak = 0;
+    let highestStreak = parseInt(localStorage.getItem("highestStreak") || "0");
+    trades.forEach(t => {
+      const profit = calcProfit(t.buy, t.sell);
+      if (profit > 0) {
+        streak++;
+        if (streak > highestStreak) {
+          highestStreak = streak;
+          localStorage.setItem("highestStreak", highestStreak);
+        }
+      } else {
+        streak = 0;
+      }
+    });
+    document.getElementById("streakDisplay").innerHTML = `
+      Current Streak: ${streak} 🔥<br>
+      Highest Streak: ${highestStreak} 🏆
+    `;
+  }
 
-
+  // ---- Initial UI update for not-logged-in users ----
+  updateTable();
+  updateChart();
+  updateMonthlyChart();
+  updateSuggestionsUI();
+  updateStreaks();
 </script>
 
 </body>
