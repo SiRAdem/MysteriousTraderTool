@@ -200,6 +200,21 @@
       font-size: 1.1em;
       color: #00ff88;
     }
+    /* Added a spinner for loading state */
+    .spinner {
+      border: 4px solid #222;
+      border-top: 4px solid #00ff88;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
   </style>
 </head>
 <body>
@@ -242,32 +257,31 @@
   <input id="buy" type="number" placeholder="Buy Price">
   <input id="sell" type="number" placeholder="Sell Price">
   <label for="playerRarity">Player Rarity:</label>
-<select id="playerRarity">
-  <option value="gold_rare">Gold Rare</option>
-  <option value="gold_common">Gold Common</option>
-  <option value="silver_rare">Silver Rare</option>
-  <option value="silver_common">Silver Common</option>
-  <option value="bronze_rare">Bronze Rare</option>
-  <option value="bronze_common">Bronze Common</option>
-  <option value="tots">TOTS</option>
-  <option value="toty">TOTY</option>
-  <option value="FBD">FUT BIRTHDAY</option>
-  <option value="FFS">FUT FANTASY</option>
-  <option value="FUTTIES">FUTTIES</option>
-  <option value="totyH">TOTY H</option>
-  
-  <option disabled>──────────</option>
-  <option value="coming_soon" disabled>Coming Soon 🔒</option>
-</select>
+  <select id="playerRarity">
+    <option value="gold_rare">Gold Rare</option>
+    <option value="gold_common">Gold Common</option>
+    <option value="silver_rare">Silver Rare</option>
+    <option value="silver_common">Silver Common</option>
+    <option value="bronze_rare">Bronze Rare</option>
+    <option value="bronze_common">Bronze Common</option>
+    <option value="tots">TOTS</option>
+    <option value="toty">TOTY</option>
+    <option value="FBD">FUT BIRTHDAY</option>
+    <option value="FFS">FUT FANTASY</option>
+    <option value="FUTTIES">FUTTIES</option>
+    <option value="totyH">TOTY H</option>
+    <option disabled>──────────</option>
+    <option value="coming_soon" disabled>Coming Soon 🔒</option>
+  </select>
 
   <button id="addBtn">Add Trade</button>
 
-  <p id="streakDisplay">Streaks loading...</p>
+  <p id="streakDisplay">Streaks loading... <span class="spinner"></span></p>
   <input type="text" id="searchInput" placeholder="Search player name..." style="margin-bottom: 10px; padding: 6px; width: 100%; max-width: 400px;">
   <div id="stats"></div>
   <table id="tradeTable">
     <thead>
-      <tr><th>Player</th><th>Rarity</th><th>Rating</th><th>Buy</th><th>Sell</th><th>Profit</th><th>Note</th><th>action</th></tr>
+      <tr><th>Player</th><th>Rarity</th><th>Rating</th><th>Buy</th><th>Sell</th><th>Profit</th><th>Note</th><th>Action</th></tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -315,6 +329,11 @@
   let profitGoal = null;
   let goalReached = false;
 
+  function formatRarity(rarity) {
+    if (!rarity) return "-";
+    return rarity.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase());
+  }
+
   // ---- Helper Functions ----
   function calcProfit(buy, sell) {
     return Math.round(sell * 0.95 - buy);
@@ -326,23 +345,22 @@
     return "💀 Messed Up";
   }
 
-  function updateTable() {
+  function updateTable(list = trades) {
     const PROFIT_HIGHLIGHT_THRESHOLD = 10000;
     const tbody = document.querySelector("#tradeTable tbody");
     tbody.innerHTML = "";
     let totalProfit = 0;
 
-    trades.forEach((t, i) => {
+    list.forEach((t, i) => {
       const profit = calcProfit(t.buy, t.sell);
       totalProfit += profit;
       const row = `<tr>
         <td>${t.player}</td>
+        <td>${formatRarity(t.rarity)}</td>
         <td>${t.rating || "-"}</td>
         <td>${t.buy}</td>
         <td>${t.sell}</td>
-        <td style="color:${profit >= 0 ? '#2ecc71' : '#e74c3c'}; font-weight: ${profit >= PROFIT_HIGHLIGHT_THRESHOLD ? 'bold' : 'normal'}">
-          ${profit}
-        </td>
+        <td style="color:${profit >= 0 ? '#2ecc71' : '#e74c3c'}; font-weight: ${profit >= PROFIT_HIGHLIGHT_THRESHOLD ? 'bold' : 'normal'}">${profit}</td>
         <td>${getNote(profit)}</td>
         <td>
           <button class="modifyBtn" data-index="${i}">✏️ Modify</button>
@@ -352,12 +370,12 @@
       tbody.innerHTML += row;
     });
 
-    let avgProfit = trades.length ? Math.round(totalProfit / trades.length) : 0;
-    let stats = `Total Trades: ${trades.length} | Total Profit: ${totalProfit} coins | Avg Profit: ${avgProfit} coins`;
-    if (trades.length) {
-      let max = trades[0];
-      let min = trades[0];
-      trades.forEach(t => {
+    let avgProfit = list.length ? Math.round(totalProfit / list.length) : 0;
+    let stats = `Total Trades: ${list.length} | Total Profit: ${totalProfit} coins | Avg Profit: ${avgProfit} coins`;
+    if (list.length) {
+      let max = list[0];
+      let min = list[0];
+      list.forEach(t => {
         if (calcProfit(t.buy, t.sell) > calcProfit(max.buy, max.sell)) max = t;
         if (calcProfit(t.buy, t.sell) < calcProfit(min.buy, min.sell)) min = t;
       });
@@ -365,19 +383,29 @@
     }
     document.getElementById("stats").innerText = stats;
 
-    updateGoalProgress(totalProfit);
-    updateHighlights();
+    if (list === trades) {
+      updateGoalProgress(totalProfit);
+      updateHighlights();
+    }
 
     // Attach Delete Button Events
     document.querySelectorAll(".deleteBtn").forEach(btn => {
       btn.onclick = () => {
         const idx = parseInt(btn.dataset.index);
-        trades.splice(idx, 1);
+        if (list === trades) {
+          trades.splice(idx, 1);
+        } else {
+          // For filtered view, remove the correct trade from original
+          const actualTradeIndex = trades.indexOf(list[idx]);
+          if (actualTradeIndex > -1) trades.splice(actualTradeIndex, 1);
+        }
         saveTradesToDB();
         updateTable();
         updateChart();
         updateMonthlyChart();
         updateSuggestionsUI();
+        updateStreaks();
+        document.getElementById("searchInput").value = "";
       };
     });
 
@@ -385,15 +413,15 @@
     document.querySelectorAll(".modifyBtn").forEach(btn => {
       btn.onclick = () => {
         const idx = parseInt(btn.dataset.index);
-        const trade = trades[idx];
+        const trade = list[idx];
         document.getElementById("player").value = trade.player;
         document.getElementById("buy").value = trade.buy;
         document.getElementById("sell").value = trade.sell;
         document.getElementById("playerRating").value = trade.rating || "";
-        document.getElementById("playerRarity").value=trade.rarity;
+        document.getElementById("playerRarity").value = trade.rarity || "gold_rare";
         const addBtn = document.getElementById("addBtn");
         addBtn.textContent = "Save Changes";
-        addBtn.dataset.editingIndex = idx;
+        addBtn.dataset.editingIndex = trades.indexOf(trade);
       };
     });
   }
@@ -437,10 +465,10 @@
     }
   }
 
-  function updateChart() {
+  function updateChart(list = trades) {
     const ctx = document.getElementById("profitChart").getContext("2d");
-    const labels = trades.map((t, i) => `${i + 1}. ${t.player}`);
-    const profits = trades.map(t => calcProfit(t.buy, t.sell));
+    const labels = list.map((t, i) => `${i + 1}. ${t.player}`);
+    const profits = list.map(t => calcProfit(t.buy, t.sell));
 
     if (chart) chart.destroy();
 
@@ -476,10 +504,10 @@
     });
   }
 
-  function updateMonthlyChart() {
+  function updateMonthlyChart(list = trades) {
     const ctx = document.getElementById("monthlyChart").getContext("2d");
     const monthlyData = {};
-    trades.forEach(t => {
+    list.forEach(t => {
       const profit = calcProfit(t.buy, t.sell);
       const date = t.date ? new Date(t.date) : new Date();
       const key = date.toLocaleString('default', { month: 'short', year: 'numeric' });
@@ -526,14 +554,19 @@
 
   function saveTradesToDB() {
     if (!userId) return;
-    db.collection("users").doc(userId).set({ trades, profitGoal });
+    db.collection("users").doc(userId).set({ trades, profitGoal })
+      .catch((err) => alert("Error saving trades: " + err.message));
   }
 
   function loadTradesFromDB() {
     db.collection("users").doc(userId).get().then(doc => {
       if (doc.exists) {
         const data = doc.data();
-        trades = data.trades || [];
+        trades = (data.trades || []).map(t => ({
+          ...t,
+          // Ensure all trade objects have the rarity property
+          rarity: t.rarity || "gold_rare"
+        }));
         profitGoal = data.profitGoal || null;
         document.getElementById("goalStatus").textContent =
           `Current Goal: ${profitGoal ? profitGoal + " coins" : "-"}`;
@@ -556,13 +589,21 @@
     const rating = ratingInput ? parseInt(ratingInput) : null;
     const rarity = document.getElementById("playerRarity").value;
     if (!player || isNaN(buy) || isNaN(sell)) return alert("Please fill all fields");
-    const editingIndex = document.getElementById("addBtn").dataset.editingIndex;
+    const addBtn = document.getElementById("addBtn");
+    const editingIndex = addBtn.dataset.editingIndex;
     if (editingIndex !== undefined) {
-      trades[editingIndex] = { player, buy, sell, rating, date: trades[editingIndex].date || new Date().toISOString() };
-      delete document.getElementById("addBtn").dataset.editingIndex;
-      document.getElementById("addBtn").textContent = "Add Trade";
+      trades[editingIndex] = {
+        player,
+        buy,
+        sell,
+        rating,
+        rarity,
+        date: trades[editingIndex].date || new Date().toISOString()
+      };
+      delete addBtn.dataset.editingIndex;
+      addBtn.textContent = "Add Trade";
     } else {
-      trades.push({ player, buy, sell, rating, date: new Date().toISOString() });
+      trades.push({ player, buy, sell, rating, rarity, date: new Date().toISOString() });
     }
     saveTradesToDB();
     updateTable();
@@ -574,7 +615,7 @@
     document.getElementById("buy").value = "";
     document.getElementById("sell").value = "";
     document.getElementById("playerRating").value = "";
-    document.getElementById("playerRarity").value;
+    document.getElementById("playerRarity").value = "gold_rare";
   };
 
   document.getElementById("setGoalBtn").onclick = () => {
@@ -639,94 +680,13 @@
   document.getElementById("showTradeBtn").addEventListener("click", () => switchTab(true));
   document.getElementById("showAnalyticsBtn").addEventListener("click", () => switchTab(false));
 
-  let filteredTrades = [];
-
   document.getElementById("searchInput").addEventListener("input", (e) => {
     const searchTerm = e.target.value.toLowerCase();
-    filteredTrades = trades.filter(t => t.player.toLowerCase().includes(searchTerm));
-    updateFilteredTable(filteredTrades);
-    updateFilteredChart(filteredTrades);
+    const filteredTrades = trades.filter(t => t.player.toLowerCase().includes(searchTerm));
+    updateTable(filteredTrades);
+    updateChart(filteredTrades);
+    updateMonthlyChart(filteredTrades);
   });
-
-  function updateFilteredTable(list) {
-    const tbody = document.querySelector("#tradeTable tbody");
-    tbody.innerHTML = "";
-    let totalProfit = 0;
-
-    list.forEach((t, i) => {
-      const profit = calcProfit(t.buy, t.sell);
-      totalProfit += profit;
-      const row = `<tr>
-        <td>${t.player}</td>
-        <td>${t.rating || "-"}</td>
-        <td>${rarity.replace("_", " ")}</td>
-        <td>${t.buy}</td>
-        <td>${t.sell}</td>
-        <td style="color:${profit >= 0 ? '#2ecc71' : '#e74c3c'}">${profit}</td>
-        <td>${getNote(profit)}</td>
-        <td><button class="deleteBtn" data-index="${i}">❌ Delete</button></td>
-      </tr>`;
-      tbody.innerHTML += row;
-    });
-
-    document.getElementById("stats").innerText =
-      `Total Trades: ${list.length} | Total Profit: ${totalProfit} coins`;
-
-    document.querySelectorAll(".deleteBtn").forEach(btn => {
-      btn.onclick = () => {
-        const idx = parseInt(btn.getAttribute("data-index"));
-        const actualTradeIndex = trades.findIndex(t => t === list[idx]);
-        if (actualTradeIndex > -1) {
-          trades.splice(actualTradeIndex, 1);
-          saveTradesToDB();
-          document.getElementById("searchInput").value = "";
-          filteredTrades = [];
-          updateTable();
-          updateChart();
-          updateMonthlyChart();
-          updateSuggestionsUI();
-          updateStreaks();
-        }
-      };
-    });
-  }
-
-  function updateFilteredChart(list) {
-    const ctx = document.getElementById("profitChart").getContext("2d");
-    const labels = list.map((t, i) => `${i + 1}. ${t.player}`);
-    const profits = list.map(t => calcProfit(t.buy, t.sell));
-    if (chart) chart.destroy();
-    chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Profit per Trade',
-          data: profits,
-          borderColor: '#00ff88',
-          backgroundColor: 'rgba(0,255,136,0.1)',
-          pointBackgroundColor: profits.map(p => p >= 0 ? '#2ecc71' : '#e74c3c'),
-          tension: 0.3
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { callback: val => val + ' 🪙' }
-          }
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => `Profit: ${ctx.parsed.y} coins`
-            }
-          }
-        }
-      }
-    });
-  }
 
   function updateGoalProgress(totalProfit) {
     const progressBar = document.getElementById("goalProgress");
@@ -811,18 +771,6 @@
       </div>
     `).join("");
   }
-  firebase.firestore().collection("trades").add(trade)
-  .then(() => {
-    console.log("Trade saved with rarity ✔️");
-  })
-  .catch((error) => {
-    console.error("Error adding trade:", error);
-  });
-  function formatRarity(rarity) {
-  return rarity.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase());
-}
-<td>${formatRarity(rarity)}</td>
-  
 
   function updateStreaks() {
     let streak = 0;
@@ -855,8 +803,3 @@
 
 </body>
 </html>
-
-
-
-
-
