@@ -145,9 +145,34 @@
       padding: 10px;
       border: 1px solid #444;
       text-align: center;
+      transition: background 0.2s;
     }
     #tradeTable thead {
       background-color: #00ff8833;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    #tradeTable th.sortable:hover {
+      background: #00ff88;
+      color: #000;
+      cursor: pointer;
+      transition: background 0.22s;
+    }
+    #tradeTable tbody tr {
+      transition: background 0.22s, opacity 0.3s;
+    }
+    #tradeTable tbody tr.new-row {
+      animation: fadeInRow 0.7s;
+    }
+    @keyframes fadeInRow {
+      0% { opacity: 0; background: #00ff8811; }
+      100% { opacity: 1; background: inherit; }
+    }
+    #tradeTable tbody tr.deleted-row {
+      opacity: 0;
+      background: #e74c3c22;
+      transition: opacity 0.4s, background 0.4s;
     }
     #tradeTable tbody tr:nth-child(even) {
       background-color: #2a2a2a;
@@ -155,6 +180,55 @@
     #tradeTable tbody tr:hover {
       background-color: #333;
     }
+    /* ===== Toasts ===== */
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 30px;
+      transform: translateX(-50%);
+      min-width: 180px;
+      max-width: 350px;
+      padding: 14px 22px;
+      border-radius: 10px;
+      background: #00ff88;
+      color: #222;
+      font-size: 1em;
+      font-weight: 700;
+      box-shadow: 0 6px 22px rgba(0,255,136,0.18);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      animation: toastFadeIn 0.8s forwards, toastFadeOut 0.6s 2.3s forwards;
+    }
+    @keyframes toastFadeIn { to { opacity: 1; } }
+    @keyframes toastFadeOut { to { opacity: 0; } }
+    /* ===== Modal ===== */
+    .modal-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #000a;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInModalBg 0.3s;
+    }
+    @keyframes fadeInModalBg { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      background: #1a1a1a;
+      color: #fff;
+      border-radius: 14px;
+      box-shadow: 0 10px 40px #00ff8830;
+      padding: 30px 24px;
+      min-width: 320px;
+      max-width: 98vw;
+      position: relative;
+      animation: fadeInModal 0.33s;
+    }
+    @keyframes fadeInModal { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+    .modal h3 { margin-top: 0; color: #00ff88; }
+    .modal-btns { margin-top: 22px; display: flex; gap: 12px; justify-content: flex-end; }
+    .modal-btns button { min-width: 80px; }
     /* ===== Cards, Highlights, Misc ===== */
     .card {
       background: rgba(255, 255, 255, 0.05);
@@ -176,9 +250,11 @@
     }
     .highlight-card.best {
       border-left: 5px solid #00ff88;
+      box-shadow: 0 0 8px #00ff8833;
     }
     .highlight-card.worst {
       border-left: 5px solid #e74c3c;
+      box-shadow: 0 0 8px #e74c3c33;
     }
     .highlight-card h3 {
       margin-bottom: 10px;
@@ -191,7 +267,7 @@
     .highlight-card.worst.animate {
       box-shadow: 0 0 18px rgba(231, 76, 60, 0.4);
     }
-    /* ===== Progress Bar ===== */
+    /* ===== Progress Bar, Confetti ===== */
     #goalProgressWrapper {
       width: 100%;
       background: #333;
@@ -209,6 +285,21 @@
       font-weight: bold;
       transition: width 0.4s ease-in-out, background 0.3s ease-in-out;
       box-shadow: 0 0 10px rgba(0,255,136,0.4);
+    }
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      opacity: 0.88;
+      animation: confetti-fall linear forwards;
+    }
+    @keyframes confetti-fall {
+      0% { top: -20px; opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 100vh; opacity: 0; }
     }
     /* ===== Misc ===== */
     #stats {
@@ -308,6 +399,48 @@
       z-index: 0;
       pointer-events: none;
     }
+    /* ===== Collapsible Section ===== */
+    .collapsible {
+      border-radius: 8px;
+      background: #191919;
+      margin-bottom: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 8px #00ff8822;
+    }
+    .collapsible-header {
+      font-weight: 700;
+      padding: 12px 18px;
+      cursor: pointer;
+      background: #222;
+      color: #00ff88;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .collapsible-body {
+      max-height: 400px;
+      overflow-y: auto;
+      transition: max-height 0.45s cubic-bezier(.53,.07,.64,.92);
+      background: #121212;
+      color: #eee;
+      padding: 14px 20px;
+    }
+    .collapsible.collapsed .collapsible-body {
+      max-height: 0;
+      padding: 0 20px;
+      overflow: hidden;
+    }
+    .collapsible.collapsed .collapsible-header:after {
+      content: "▼";
+    }
+    .collapsible-header:after {
+      content: "▲";
+      font-size: 1.1em;
+      margin-left: 12px;
+      transition: transform 0.2s;
+    }
+    /* ===== Mobile ===== */
     @media (max-width: 700px) {
       .highlight-card { min-width: 120px; padding: 8px; }
       #selectWrapper { width: 100%; }
@@ -315,6 +448,7 @@
       #comingSoonCard { flex-direction: column; text-align: center; padding: 18px 8px; }
       #comingSoonCard > div:first-child { font-size: 2em; }
       #comingSoonCard h2 { font-size: 1.2em; }
+      #auth-section { position: static; margin: 10px 0; }
     }
   </style>
 </head>
@@ -323,6 +457,7 @@
 <h1>
   <img src="ChatGPT Image Jun 18, 2025, 02_18_51 PM.png" id="logo" alt="">
   Mysterious Trader Tool
+  <button id="themeToggleBtn" style="margin-left:auto; margin-right:10px; background:#222; color:#00ff88; border:1.5px solid #00ff88; font-size:.98em; padding:7px 13px; border-radius:7px;">🌒 Toggle Theme</button>
 </h1>
 <div id="tabSwitcher">
   <button id="showTradeBtn" class="tabBtn active">🧾 Trade Tracker</button>
@@ -387,6 +522,7 @@
     </select>
   </div>
   <button id="addBtn">Add Trade</button>
+  <button id="clearBtn" style="background:#1a1a1a; color:#00ff88; border:1.5px solid #00ff88; margin-left:7px;">Clear</button>
   <p id="streakDisplay">Streaks loading... <span class="spinner"></span></p>
   <label class="input-label" for="searchInput">Search player name...</label>
   <input type="text" id="searchInput" class="fancy-input" placeholder="Search player name..." style="margin-bottom: 10px;">
@@ -394,12 +530,12 @@
   <table id="tradeTable">
     <thead>
       <tr>
-        <th>Player</th>
-        <th>Rarity</th>
-        <th>Rating</th>
-        <th>Buy</th>
-        <th>Sell</th>
-        <th>Profit</th>
+        <th class="sortable" data-sort="player">Player</th>
+        <th class="sortable" data-sort="rarity">Rarity</th>
+        <th class="sortable" data-sort="rating">Rating</th>
+        <th class="sortable" data-sort="buy">Buy</th>
+        <th class="sortable" data-sort="sell">Sell</th>
+        <th class="sortable" data-sort="profit">Profit</th>
         <th>Note</th>
         <th>Action</th>
       </tr>
@@ -435,8 +571,12 @@
   <canvas id="monthlyChart" width="400" height="200"></canvas>
 </div>
 <section id="suggestionsSection" style="margin:20px; padding:10px; background:#121212; border-radius:8px; color:#eee;">
-  <h2>💡 Smart Suggestions</h2>
-  <div id="suggestionsList"></div>
+  <div class="collapsible" id="suggestionsCollapsible">
+    <div class="collapsible-header" tabindex="0">💡 Smart Suggestions</div>
+    <div class="collapsible-body">
+      <div id="suggestionsList"></div>
+    </div>
+  </div>
 </section>
 
 <div class="card">
@@ -450,7 +590,84 @@
   </div>
 </div>
 
+<!-- Toast container -->
+<div id="toastContainer"></div>
+<!-- Modal container -->
+<div id="modalContainer"></div>
+
 <script>
+  // === THEME TOGGLE ===
+  const themeBtn = document.getElementById("themeToggleBtn");
+  themeBtn.onclick = function() {
+    document.body.classList.toggle("light-theme");
+    if(document.body.classList.contains("light-theme")) {
+      document.body.style.background = "linear-gradient(145deg, #e9e9e9, #fafafa)";
+      document.body.style.color = "#222";
+      themeBtn.innerHTML = "🌞 Toggle Theme";
+    } else {
+      document.body.style.background = "linear-gradient(145deg, #0f0f0f, #1f1f1f)";
+      document.body.style.color = "#fff";
+      themeBtn.innerHTML = "🌒 Toggle Theme";
+    }
+  };
+
+  // === TOASTS ===
+  function showToast(msg) {
+    let toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = msg;
+    document.getElementById("toastContainer").appendChild(toast);
+    setTimeout(()=>toast.remove(), 3000);
+  }
+
+  // === MODALS ===
+  function showModal({ title, content, confirmText, cancelText, onConfirm, onCancel }) {
+    const bg = document.createElement("div");
+    bg.className = "modal-bg";
+    const modal = document.createElement("div");
+    modal.className = "modal";
+    modal.innerHTML = `<h3>${title}</h3><div>${content}</div>
+      <div class="modal-btns">
+        <button id="modalConfirm">${confirmText||"Confirm"}</button>
+        <button id="modalCancel">${cancelText||"Cancel"}</button>
+      </div>`;
+    bg.appendChild(modal);
+    document.getElementById("modalContainer").appendChild(bg);
+    document.getElementById("modalConfirm").onclick = function() {
+      bg.remove();
+      if (onConfirm) onConfirm();
+    };
+    document.getElementById("modalCancel").onclick = function() {
+      bg.remove();
+      if (onCancel) onCancel();
+    };
+  }
+
+  // === CONFETTI ===
+  function confettiBurst() {
+    for(let i=0; i<28; i++) {
+      let c = document.createElement("div");
+      c.className = "confetti";
+      c.style.left = Math.random()*100+'vw';
+      c.style.top = '-20px';
+      c.style.background = `hsl(${Math.random()*360},90%,60%)`;
+      c.style.animationDuration = (2+Math.random()*2)+'s';
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(), 3500);
+    }
+  }
+
+  // === COLLAPSIBLE SUGGESTIONS ===
+  const suggestionsCollapsible = document.getElementById("suggestionsCollapsible");
+  suggestionsCollapsible.classList.add("collapsed");
+  suggestionsCollapsible.querySelector(".collapsible-header").onclick = function() {
+    suggestionsCollapsible.classList.toggle("collapsed");
+  };
+  suggestionsCollapsible.querySelector(".collapsible-header").addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ suggestionsCollapsible.classList.toggle("collapsed");}
+  })
+
+  // === FIREBASE ===
   const firebaseConfig = {
     apiKey: "AIzaSyBH9OtMF64mpkrWCHWH4fUr7FzELGlqiD8",
     authDomain: "mysterioustradertool.firebaseapp.com",
@@ -468,6 +685,7 @@
   let chart;
   let profitGoal = null;
   let goalReached = false;
+  let sortKey = null, sortAsc = true;
 
   function formatRarity(rarity) {
     if (!rarity) return "-";
@@ -485,7 +703,33 @@
     return "💀 Messed Up";
   }
 
+  // === SORTABLE TABLE ===
+  document.querySelectorAll("th.sortable").forEach(th=>{
+    th.onclick = function(){
+      let key = th.dataset.sort;
+      if (sortKey === key) sortAsc = !sortAsc;
+      else { sortKey = key; sortAsc = true; }
+      updateTable();
+    }
+  });
+
+  // === TRADE TABLE RENDER ===
   function updateTable(list = trades) {
+    // Sort
+    if (sortKey) {
+      list = [...list].sort((a,b)=>{
+        if(sortKey==="profit") {
+          let pa = calcProfit(a.buy,a.sell), pb = calcProfit(b.buy,b.sell);
+          return sortAsc ? pa-pb : pb-pa;
+        }
+        if(sortKey==="buy"||sortKey==="sell"||sortKey==="rating") {
+          let va = a[sortKey]||0, vb = b[sortKey]||0;
+          return sortAsc ? va-vb : vb-va;
+        }
+        let va = (a[sortKey]||"").toString().toLowerCase(), vb = (b[sortKey]||"").toString().toLowerCase();
+        return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+      });
+    }
     const PROFIT_HIGHLIGHT_THRESHOLD = 10000;
     const tbody = document.querySelector("#tradeTable tbody");
     tbody.innerHTML = "";
@@ -494,7 +738,8 @@
     list.forEach((t, i) => {
       const profit = calcProfit(t.buy, t.sell);
       totalProfit += profit;
-      const row = `<tr>
+      const row = document.createElement("tr");
+      row.innerHTML = `
         <td>${t.player}</td>
         <td>${formatRarity(t.rarity)}</td>
         <td>${t.rating || "-"}</td>
@@ -503,11 +748,14 @@
         <td style="color:${profit >= 0 ? '#2ecc71' : '#e74c3c'}; font-weight: ${profit >= PROFIT_HIGHLIGHT_THRESHOLD ? 'bold' : 'normal'}">${profit}</td>
         <td>${getNote(profit)}</td>
         <td>
-          <button class="modifyBtn" data-index="${i}">✏️ Modify</button>
-          <button class="deleteBtn" data-index="${i}">❌ Delete</button>
-        </td>
-      </tr>`;
-      tbody.innerHTML += row;
+          <button class="modifyBtn" data-index="${i}">✏️</button>
+          <button class="deleteBtn" data-index="${i}">❌</button>
+          <button class="detailsBtn" data-index="${i}">🔍</button>
+        </td>`;
+      tbody.appendChild(row);
+      // Animation for new row
+      row.classList.add("new-row");
+      setTimeout(()=>row.classList.remove("new-row"),500);
     });
 
     let avgProfit = list.length ? Math.round(totalProfit / list.length) : 0;
@@ -528,25 +776,30 @@
       updateHighlights();
     }
 
+    // Attach Delete Button Events
     document.querySelectorAll(".deleteBtn").forEach(btn => {
       btn.onclick = () => {
-        const idx = parseInt(btn.dataset.index);
-        if (list === trades) {
-          trades.splice(idx, 1);
-        } else {
-          const actualTradeIndex = trades.indexOf(list[idx]);
-          if (actualTradeIndex > -1) trades.splice(actualTradeIndex, 1);
-        }
-        saveTradesToDB();
-        updateTable();
-        updateChart();
-        updateMonthlyChart();
-        updateSuggestionsUI();
-        updateStreaks();
-        document.getElementById("searchInput").value = "";
+        showModal({
+          title:"Delete Trade",
+          content:`Are you sure you want to delete this trade?`,
+          confirmText:"Delete",
+          cancelText:"Cancel",
+          onConfirm:()=>{
+            const idx = parseInt(btn.dataset.index);
+            trades.splice(idx, 1);
+            saveTradesToDB();
+            updateTable();
+            updateChart();
+            updateMonthlyChart();
+            updateSuggestionsUI();
+            updateStreaks();
+            showToast("Trade deleted");
+          }
+        });
       };
     });
 
+    // Attach Modify Button Events
     document.querySelectorAll(".modifyBtn").forEach(btn => {
       btn.onclick = () => {
         const idx = parseInt(btn.dataset.index);
@@ -560,6 +813,26 @@
         addBtn.textContent = "Save Changes";
         addBtn.dataset.editingIndex = trades.indexOf(trade);
       };
+    });
+
+    // Details modal
+    document.querySelectorAll(".detailsBtn").forEach(btn => {
+      btn.onclick = () => {
+        const idx = parseInt(btn.dataset.index);
+        const t = list[idx];
+        showModal({
+          title: t.player+" Details",
+          content: `<b>Player:</b> ${t.player}<br>
+            <b>Rarity:</b> ${formatRarity(t.rarity)}<br>
+            <b>Rating:</b> ${t.rating||"-"}<br>
+            <b>Buy:</b> ${t.buy}<br>
+            <b>Sell:</b> ${t.sell}<br>
+            <b>Profit:</b> ${calcProfit(t.buy,t.sell)} coins<br>
+            <b>Note:</b> ${getNote(calcProfit(t.buy,t.sell))}<br>
+            <i>Date: ${t.date?new Date(t.date).toLocaleString():"-"}</i>`,
+          confirmText:"OK",cancelText:""
+        });
+      }
     });
   }
 
@@ -617,12 +890,13 @@
           label: 'Profit per Trade',
           data: profits,
           borderColor: '#00ff88',
-          backgroundColor: 'rgba(0,255,136,0.1)',
+          backgroundColor: 'rgba(0,255,136,0.12)',
           pointBackgroundColor: profits.map(p => p >= 0 ? '#2ecc71' : '#e74c3c'),
           tension: 0.3
         }]
       },
       options: {
+        animation: { duration: 900 },
         scales: {
           y: {
             beginAtZero: true,
@@ -669,6 +943,7 @@
         }]
       },
       options: {
+        animation: { duration: 900 },
         scales: {
           y: {
             beginAtZero: true,
@@ -692,7 +967,7 @@
   function saveTradesToDB() {
     if (!userId) return;
     db.collection("users").doc(userId).set({ trades, profitGoal })
-      .catch((err) => alert("Error saving trades: " + err.message));
+      .catch((err) => showToast("Error saving trades: " + err.message));
   }
 
   function loadTradesFromDB() {
@@ -724,7 +999,10 @@
     const ratingInput = document.getElementById("playerRating").value;
     const rating = ratingInput ? parseInt(ratingInput) : null;
     const rarity = document.getElementById("playerRarity").value;
-    if (!player || isNaN(buy) || isNaN(sell)) return alert("Please fill all fields");
+    if (!player || isNaN(buy) || isNaN(sell)) {
+      showToast("Please fill all fields");
+      return;
+    }
     const addBtn = document.getElementById("addBtn");
     const editingIndex = addBtn.dataset.editingIndex;
     if (editingIndex !== undefined) {
@@ -738,8 +1016,10 @@
       };
       delete addBtn.dataset.editingIndex;
       addBtn.textContent = "Add Trade";
+      showToast("Trade updated!");
     } else {
       trades.push({ player, buy, sell, rating, rarity, date: new Date().toISOString() });
+      showToast("Trade added!");
     }
     saveTradesToDB();
     updateTable();
@@ -750,191 +1030,4 @@
     document.getElementById("player").value = "";
     document.getElementById("buy").value = "";
     document.getElementById("sell").value = "";
-    document.getElementById("playerRating").value = "";
-    document.getElementById("playerRarity").value = "gold_rare";
-  };
-
-  document.getElementById("setGoalBtn").onclick = () => {
-    const input = parseInt(document.getElementById("profitGoalInput").value);
-    if (isNaN(input) || input <= 0) return alert("Enter a valid positive number.");
-    profitGoal = input;
-    document.getElementById("goalStatus").textContent = `Current Goal: ${profitGoal} coins`;
-    saveTradesToDB();
-    updateTable();
-    updateGoalProgress(trades.reduce((sum, t) => sum + calcProfit(t.buy, t.sell), 0));
-  };
-
-  document.getElementById("loginBtn").addEventListener("click", () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch((error) => {
-      alert("Login failed: " + error.message);
-    });
-  });
-
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    auth.signOut();
-  });
-
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      userId = user.uid;
-      document.getElementById("loginBtn").style.display = "none";
-      document.getElementById("logoutBtn").style.display = "inline-block";
-      document.getElementById("user-email").textContent = user.email;
-      loadTradesFromDB();
-    } else {
-      userId = null;
-      trades = [];
-      updateTable();
-      updateChart();
-      updateMonthlyChart();
-      updateSuggestionsUI();
-      updateStreaks();
-      document.getElementById("user-email").textContent = "";
-      document.getElementById("loginBtn").style.display = "inline-block";
-      document.getElementById("logoutBtn").style.display = "none";
-    }
-  });
-
-  function switchTab(showTrade) {
-    const tradeSection = document.getElementById("tradeSection");
-    const analyticsSection = document.getElementById("analyticsSection");
-    if (showTrade) {
-      tradeSection.style.display = "block";
-      analyticsSection.style.display = "none";
-      document.getElementById("showTradeBtn").classList.add("active");
-      document.getElementById("showAnalyticsBtn").classList.remove("active");
-    } else {
-      tradeSection.style.display = "none";
-      analyticsSection.style.display = "block";
-      document.getElementById("showTradeBtn").classList.remove("active");
-      document.getElementById("showAnalyticsBtn").classList.add("active");
-      updateMonthlyChart();
-    }
-  }
-
-  document.getElementById("showTradeBtn").addEventListener("click", () => switchTab(true));
-  document.getElementById("showAnalyticsBtn").addEventListener("click", () => switchTab(false));
-
-  document.getElementById("searchInput").addEventListener("input", (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    const filteredTrades = trades.filter(t => t.player.toLowerCase().includes(searchTerm));
-    updateTable(filteredTrades);
-    updateChart(filteredTrades);
-    updateMonthlyChart(filteredTrades);
-  });
-
-  function updateGoalProgress(totalProfit) {
-    const progressBar = document.getElementById("goalProgress");
-    if (!profitGoal || profitGoal <= 0) {
-      progressBar.style.width = "0%";
-      progressBar.textContent = "No Goal Set";
-      progressBar.style.background = "#555";
-      goalReached = false;
-      return;
-    }
-    const percent = Math.min(100, Math.round((totalProfit / profitGoal) * 100));
-    progressBar.style.width = percent + "%";
-    progressBar.textContent = percent + "%";
-    if (percent >= 100) {
-      progressBar.style.background = "#00ff88";
-      if (!goalReached) {
-        goalReached = true;
-        alert("🎉 Goal Achieved! You’ve reached your monthly profit target!");
-      }
-    } else if (percent >= 50) {
-      progressBar.style.background = "orange";
-      goalReached = false;
-    } else {
-      progressBar.style.background = "#e74c3c";
-      goalReached = false;
-    }
-  }
-
-  function getSmartSuggestions() {
-    if (!trades.length) return [];
-
-    const playerStats = {};
-    trades.forEach(t => {
-      const profit = calcProfit(t.buy, t.sell);
-      if (!playerStats[t.player]) {
-        playerStats[t.player] = {
-          player: t.player,
-          totalBuy: 0,
-          totalSell: 0,
-          tradeCount: 0,
-          totalProfit: 0,
-        };
-      }
-      playerStats[t.player].totalBuy += t.buy;
-      playerStats[t.player].totalSell += t.sell;
-      playerStats[t.player].tradeCount++;
-      playerStats[t.player].totalProfit += profit;
-    });
-
-    const suggestions = Object.values(playerStats).map(p => {
-      const avgBuy = Math.round(p.totalBuy / p.tradeCount);
-      const avgSell = Math.round(p.totalSell / p.tradeCount);
-      const avgProfit = Math.round(p.totalProfit / p.tradeCount);
-
-      return {
-        player: p.player,
-        avgBuy,
-        avgSell,
-        avgProfit,
-        suggestion: avgProfit > 0
-          ? `Consider buying around ${avgBuy} 🪙 and selling near ${avgSell} 🪙`
-          : `Be cautious trading this player, average profit is negative`,
-      };
-    });
-
-    suggestions.sort((a, b) => b.avgProfit - a.avgProfit);
-    return suggestions;
-  }
-
-  function updateSuggestionsUI() {
-    const suggestions = getSmartSuggestions();
-    const container = document.getElementById("suggestionsList");
-    if (!suggestions.length) {
-      container.innerHTML = "<p>No suggestions available yet. Add some trades first!</p>";
-      return;
-    }
-    container.innerHTML = suggestions.map(s => `
-      <div style="padding:10px; margin-bottom:8px; background:#222; border-radius:6px;">
-        <strong>${s.player}</strong><br>
-        <em>${s.suggestion}</em><br>
-        <small>Avg Profit: ${s.avgProfit} 🪙</small>
-      </div>
-    `).join("");
-  }
-
-  function updateStreaks() {
-    let streak = 0;
-    let highestStreak = parseInt(localStorage.getItem("highestStreak") || "0");
-    trades.forEach(t => {
-      const profit = calcProfit(t.buy, t.sell);
-      if (profit > 0) {
-        streak++;
-        if (streak > highestStreak) {
-          highestStreak = streak;
-          localStorage.setItem("highestStreak", highestStreak);
-        }
-      } else {
-        streak = 0;
-      }
-    });
-    document.getElementById("streakDisplay").innerHTML = `
-      Current Streak: ${streak} 🔥<br>
-      Highest Streak: ${highestStreak} 🏆
-    `;
-  }
-
-  updateTable();
-  updateChart();
-  updateMonthlyChart();
-  updateSuggestionsUI();
-  updateStreaks();
-</script>
-
-</body>
-</html>
+    document.getElementById("
