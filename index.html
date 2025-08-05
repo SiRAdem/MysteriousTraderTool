@@ -243,7 +243,7 @@
   <div id="stats"></div>
   <table id="tradeTable">
     <thead>
-      <tr><th>Player</th><th>Rating</th><th>Buy</th><th>Sell</th><th>Profit</th><th>Note</th><th>action</th></tr>
+      <tr><th>Player</th><th>Rarity</th><th>Rating</th><th>Buy</th><th>Sell</th><th>Profit</th><th>Note</th><th>action</th></tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -366,6 +366,7 @@
         document.getElementById("buy").value = trade.buy;
         document.getElementById("sell").value = trade.sell;
         document.getElementById("playerRating").value = trade.rating || "";
+        document.getElementById("playerRarity").value=trade.rarity;
         const addBtn = document.getElementById("addBtn");
         addBtn.textContent = "Save Changes";
         addBtn.dataset.editingIndex = idx;
@@ -529,6 +530,7 @@
     const sell = parseInt(document.getElementById("sell").value);
     const ratingInput = document.getElementById("playerRating").value;
     const rating = ratingInput ? parseInt(ratingInput) : null;
+    const rarity = document.getElementById("playerRarity").value;
     if (!player || isNaN(buy) || isNaN(sell)) return alert("Please fill all fields");
     const editingIndex = document.getElementById("addBtn").dataset.editingIndex;
     if (editingIndex !== undefined) {
@@ -548,6 +550,7 @@
     document.getElementById("buy").value = "";
     document.getElementById("sell").value = "";
     document.getElementById("playerRating").value = "";
+    document.getElementById("playerRarity").value;
   };
 
   document.getElementById("setGoalBtn").onclick = () => {
@@ -632,6 +635,7 @@
       const row = `<tr>
         <td>${t.player}</td>
         <td>${t.rating || "-"}</td>
+        <td>${rarity.replace("_", " ")}</td>
         <td>${t.buy}</td>
         <td>${t.sell}</td>
         <td style="color:${profit >= 0 ? '#2ecc71' : '#e74c3c'}">${profit}</td>
@@ -783,6 +787,18 @@
       </div>
     `).join("");
   }
+  firebase.firestore().collection("trades").add(trade)
+  .then(() => {
+    console.log("Trade saved with rarity ✔️");
+  })
+  .catch((error) => {
+    console.error("Error adding trade:", error);
+  });
+  function formatRarity(rarity) {
+  return rarity.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase());
+}
+<td>${formatRarity(rarity)}</td>
+  
 
   function updateStreaks() {
     let streak = 0;
@@ -815,3 +831,4 @@
 
 </body>
 </html>
+
