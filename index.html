@@ -236,6 +236,18 @@
   <input type="number"  id="playerRating" placeholder="Rating">
   <input id="buy" type="number" placeholder="Buy Price">
   <input id="sell" type="number" placeholder="Sell Price">
+  <label for="playerRarity">Player Rarity:</label>
+<select id="playerRarity">
+  <option value="gold_rare">Gold Rare</option>
+  <option value="gold_common">Gold Common</option>
+  <option value="silver_rare">Silver Rare</option>
+  <option value="silver_common">Silver Common</option>
+  <option value="bronze_rare">Bronze Rare</option>
+  <option value="bronze_common">Bronze Common</option>
+  <option disabled>──────────</option>
+  <option value="coming_soon" disabled>Coming Soon 🔒</option>
+</select>
+
   <button id="addBtn">Add Trade</button>
 
   <p id="streakDisplay">Streaks loading...</p>
@@ -831,4 +843,5 @@
 
 </body>
 </html>
+
 
