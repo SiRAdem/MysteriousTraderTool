@@ -17,32 +17,6 @@
       padding: 20px;
       margin: 0;
     }
-    #goalProgressWrapper {
-      width: 100%;
-      background: #333;
-      height: 22px;
-      border-radius: 12px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-    #goalProgress {
-      height: 100%;
-      border-radius: 12px;
-      line-height: 22px;
-      text-align: center;
-      color: #000;
-      font-weight: bold;
-      transition: width 0.4s ease-in-out, background 0.3s ease-in-out;
-      box-shadow: 0 0 10px rgba(0,255,136,0.4);
-    }
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 20px;
-      margin: 20px 0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(6px);
-    }
     h1 {
       color: #00ff88;
       display: flex;
@@ -55,31 +29,111 @@
       padding: 10px 0;
       border-bottom: 1px solid #333;
     }
-    #addBtn {
-  margin-left: 25px;
-}
-    input, select {
-      margin: 5px;
-      padding: 8px;
-      border: none;
-      border-radius: 4px;
-      font-size: 1em;
+    /* ===== Enhanced Inputs ===== */
+    .fancy-input, .fancy-select {
+      width: 100%;
+      max-width: 420px;
+      margin: 9px 0 12px 0;
+      padding: 13px 18px;
+      font-family: inherit;
+      font-size: 1.09em;
+      background: linear-gradient(90deg,#232323 70%,#282c34 100%);
+      color: #00ff88;
+      border: 1.8px solid #00ff88;
+      border-radius: 12px;
+      outline: none;
+      box-shadow: 0 3px 14px rgba(0,255,136,0.09);
+      transition: border 0.22s, box-shadow 0.3s, background 0.2s;
+      font-weight: 500;
+      letter-spacing: .01em;
     }
+    .fancy-input:focus, .fancy-select:focus {
+      border-color: #00c96d;
+      box-shadow: 0 0 14px #00ff8850;
+      background: linear-gradient(90deg,#222, #00ff88 100%);
+      color: #000;
+    }
+    .fancy-input[type="number"]::-webkit-inner-spin-button, 
+    .fancy-input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .fancy-input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    ::placeholder {
+      color: #4ce8aa;
+      opacity: .8;
+      font-weight: 400;
+    }
+    .input-label {
+      font-size: 1em;
+      color: #00ff88;
+      margin-bottom: 3px;
+      display: block;
+      font-weight: 600;
+      letter-spacing: .03em;
+    }
+    #selectWrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      max-width: 420px;
+      vertical-align: middle;
+      margin-bottom: 8px;
+    }
+    #playerRarity.fancy-select {
+      appearance: none;
+      background: linear-gradient(90deg, #232323, #333);
+      color: #00ff88;
+      border: 1.8px solid #00ff88;
+      padding: 13px 40px 13px 18px;
+      border-radius: 12px;
+      font-size: 1.09em;
+      font-family: 'Rubik', sans-serif;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0,255,136,0.1);
+      position: relative;
+    }
+    #selectWrapper:after {
+      content: "▼";
+      position: absolute;
+      right: 18px;
+      top: 19px;
+      color: #00ff88;
+      pointer-events: none;
+      font-size: 1.2em;
+      z-index: 2;
+    }
+    /* Color options for select */
+    #playerRarity option[value*="gold"] { color: gold; }
+    #playerRarity option[value*="silver"] { color: #bfc1c2; }
+    #playerRarity option[value*="bronze"] { color: #cd7f32; }
+    #playerRarity option[value*="tots"], #playerRarity option[value*="toty"],
+    #playerRarity option[value*="FBD"], #playerRarity option[value*="FFS"],
+    #playerRarity option[value*="FUTTIES"], #playerRarity option[value*="totyH"] { color: #00ff88; }
+    /* ===== Enhanced Buttons ===== */
     button {
       background: linear-gradient(145deg, #00ff88, #00c96d);
       color: #000;
-      font-weight: 600;
-      padding: 10px 14px;
+      font-weight: 700;
+      padding: 12px 18px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 8px rgba(0, 255, 136, 0.2);
+      transition: all 0.22s ease;
+      box-shadow: 0 4px 14px rgba(0, 255, 136, 0.15);
+      font-size: 1.08em;
+      letter-spacing: .01em;
+      margin-top: 7px;
+      margin-bottom: 7px;
     }
     button:hover {
-      transform: translateY(-2px) scale(1.03);
-      box-shadow: 0 6px 14px rgba(0, 255, 136, 0.4);
+      transform: translateY(-2px) scale(1.035);
+      box-shadow: 0 6px 24px rgba(0, 255, 136, 0.23);
+      background: linear-gradient(145deg, #00c96d, #00ff88);
     }
+    /* ===== Table ===== */
     #tradeTable {
       width: 100%;
       margin-top: 10px;
@@ -101,6 +155,82 @@
     #tradeTable tbody tr:hover {
       background-color: #333;
     }
+    /* ===== Cards, Highlights, Misc ===== */
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(6px);
+    }
+    .highlight-card {
+      flex: 1;
+      min-width: 180px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 255, 136, 0.1);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .highlight-card.best {
+      border-left: 5px solid #00ff88;
+    }
+    .highlight-card.worst {
+      border-left: 5px solid #e74c3c;
+    }
+    .highlight-card h3 {
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    .highlight-card.animate {
+      transform: scale(1.05);
+      box-shadow: 0 0 18px rgba(0, 255, 136, 0.4);
+    }
+    .highlight-card.worst.animate {
+      box-shadow: 0 0 18px rgba(231, 76, 60, 0.4);
+    }
+    /* ===== Progress Bar ===== */
+    #goalProgressWrapper {
+      width: 100%;
+      background: #333;
+      height: 22px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    #goalProgress {
+      height: 100%;
+      border-radius: 12px;
+      line-height: 22px;
+      text-align: center;
+      color: #000;
+      font-weight: bold;
+      transition: width 0.4s ease-in-out, background 0.3s ease-in-out;
+      box-shadow: 0 0 10px rgba(0,255,136,0.4);
+    }
+    /* ===== Misc ===== */
+    #stats {
+      margin: 8px 0;
+      font-size: 1.1em;
+      color: #00ff88;
+    }
+    .spinner {
+      border: 4px solid #222;
+      border-top: 4px solid #00ff88;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    /* ===== Auth, Tabs, Logo ===== */
     #logo {
       width: 40px;
       height: 40px;
@@ -115,24 +245,6 @@
       margin-top: 20px;
       display: flex;
       gap: 10px;
-    }
-    .tabBtn {
-      background: #222;
-      color: #00ff88;
-      border: 1px solid #00ff88;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .tabBtn.active {
-      background: #00ff88;
-      color: #000;
-      font-weight: bold;
-      box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
-    }
-    .tabBtn:hover {
-      transform: scale(1.05);
     }
     #auth-section {
       position: absolute;
@@ -166,103 +278,7 @@
       color: #aaa;
       margin: 0;
     }
-    .highlight-card {
-      flex: 1;
-      min-width: 180px;
-      background: rgba(255, 255, 255, 0.06);
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 255, 136, 0.1);
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-    .highlight-card.best {
-      border-left: 5px solid #00ff88;
-    }
-    .highlight-card.worst {
-      border-left: 5px solid #e74c3c;
-    }
-    .highlight-card h3 {
-      margin-bottom: 10px;
-      font-size: 1.2em;
-    }
-    .highlight-card.animate {
-      transform: scale(1.05);
-      box-shadow: 0 0 18px rgba(0, 255, 136, 0.4);
-    }
-    .highlight-card.worst.animate {
-      box-shadow: 0 0 18px rgba(231, 76, 60, 0.4);
-    }
-    #stats {
-      margin: 8px 0;
-      font-size: 1.1em;
-      color: #00ff88;
-    }
-    .spinner {
-      border: 4px solid #222;
-      border-top: 4px solid #00ff88;
-      border-radius: 50%;
-      width: 22px;
-      height: 22px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
-    }
-    /* Custom select styling */
-    #selectWrapper {
-      position: relative;
-      display: inline-block;
-      width: 220px;
-      vertical-align: middle;
-      margin-bottom: 8px;
-    }
-    #playerRarity {
-      appearance: none;
-      background: linear-gradient(90deg, #232323, #333);
-      color: #00ff88;
-      border: 1px solid #00ff88;
-      padding: 10px 40px 10px 16px;
-      border-radius: 8px;
-      font-size: 1em;
-      font-family: 'Rubik', sans-serif;
-      font-weight: 500;
-      transition: box-shadow 0.2s;
-      box-shadow: 0 2px 8px rgba(0,255,136,0.1);
-      position: relative;
-    }
-    #playerRarity:focus {
-      outline: none;
-      box-shadow: 0 0 10px #00ff8855;
-      border-color: #00ff88;
-    }
-    #selectWrapper:after {
-      content: "▼";
-      position: absolute;
-      right: 18px;
-      top: 16px;
-      color: #00ff88;
-      pointer-events: none;
-      font-size: 1em;
-    }
-    #playerRarity option[value*="gold"] { color: gold; }
-    #playerRarity option[value*="silver"] { color: #bfc1c2; }
-    #playerRarity option[value*="bronze"] { color: #cd7f32; }
-    #playerRarity option[value*="tots"], #playerRarity option[value*="toty"],
-    #playerRarity option[value*="FBD"], #playerRarity option[value*="FFS"],
-    #playerRarity option[value*="FUTTIES"], #playerRarity option[value*="totyH"] { color: #00ff88; }
-    @media (max-width: 700px) {
-      .highlight-card { min-width: 120px; padding: 8px; }
-      #selectWrapper { width: 100%; }
-      #playerRarity { width: 100%; }
-      #comingSoonCard { flex-direction: column; text-align: center; padding: 18px 8px; }
-      #comingSoonCard > div:first-child { font-size: 2em; }
-      #comingSoonCard h2 { font-size: 1.2em; }
-    }
-    /* Coming soon card */
+    /* ===== Coming Soon Card ===== */
     @keyframes hypePop {
       0% {transform: scale(1);}
       100% {transform: scale(1.13);}
@@ -291,6 +307,14 @@
       opacity: 0.35;
       z-index: 0;
       pointer-events: none;
+    }
+    @media (max-width: 700px) {
+      .highlight-card { min-width: 120px; padding: 8px; }
+      #selectWrapper { width: 100%; }
+      .fancy-input, .fancy-select { max-width: 100%; }
+      #comingSoonCard { flex-direction: column; text-align: center; padding: 18px 8px; }
+      #comingSoonCard > div:first-child { font-size: 2em; }
+      #comingSoonCard h2 { font-size: 1.2em; }
     }
   </style>
 </head>
@@ -329,13 +353,17 @@
 
 <div id="tradeSection" class="card" style="display: block;">
   <h2>Add New Trade</h2>
-  <input id="player" placeholder="Player or Item Name">
-  <input type="number"  id="playerRating" placeholder="Rating">
-  <input id="buy" type="number" placeholder="Buy Price">
-  <input id="sell" type="number" placeholder="Sell Price">
-  <label for="playerRarity">Player Rarity:</label>
+  <label class="input-label" for="player">Player or Item Name</label>
+  <input id="player" class="fancy-input" placeholder="Player or Item Name">
+  <label class="input-label" for="playerRating">Rating</label>
+  <input id="playerRating" class="fancy-input" type="number" min="0" max="99" placeholder="Rating">
+  <label class="input-label" for="buy">Buy Price</label>
+  <input id="buy" class="fancy-input" type="number" min="0" placeholder="Buy Price">
+  <label class="input-label" for="sell">Sell Price</label>
+  <input id="sell" class="fancy-input" type="number" min="0" placeholder="Sell Price">
+  <label class="input-label" for="playerRarity">Player Rarity</label>
   <div id="selectWrapper">
-    <select id="playerRarity">
+    <select id="playerRarity" class="fancy-select">
       <optgroup label="Gold">
         <option value="gold_rare">Gold Rare 🟨</option>
         <option value="gold_common">Gold Common 🟨</option>
@@ -360,7 +388,8 @@
   </div>
   <button id="addBtn">Add Trade</button>
   <p id="streakDisplay">Streaks loading... <span class="spinner"></span></p>
-  <input type="text" id="searchInput" placeholder="Search player name..." style="margin-bottom: 10px; padding: 6px; width: 100%; max-width: 400px;">
+  <label class="input-label" for="searchInput">Search player name...</label>
+  <input type="text" id="searchInput" class="fancy-input" placeholder="Search player name..." style="margin-bottom: 10px;">
   <div id="stats"></div>
   <table id="tradeTable">
     <thead>
@@ -386,15 +415,15 @@
   </div>
   <div>
     <h2 style="font-family:'Rubik',sans-serif; font-weight:900; font-size:2em; margin:0 0 10px 0; color:#00c96d; letter-spacing:1px;">
-      New Features Coming Soon!
+      New Rarity Tier Coming Soon!
     </h2>
     <p style="font-size:1.13em; font-weight:500; margin:0 0 10px 0;">
-      Get ready for <span style="background:#fff176; color:#222; border-radius:5px; padding:3px 8px;">EXCLUSIVE</span> trades and powerful sniping guide!
+      Get ready for <span style="background:#fff176; color:#222; border-radius:5px; padding:3px 8px;">EXCLUSIVE</span> cards and powerful new players!
       <br>
-      Stay tuned, something <b style="color:#e74c3c;">BIG</b> is arriving in this TOOL!
+      Stay tuned, something <b style="color:#e74c3c;">BIG</b> is arriving in FUT!
     </p>
     <span style="display:inline-block; background:#fff3e0; color:#e67e22; font-weight:700; border-radius:5px; padding:4px 10px; box-shadow: 0 2px 8px rgba(255,200,0,0.08);">
-      🚀 Stay Tuned!
+      🚀 Unlock soon!
     </span>
   </div>
 </div>
@@ -412,7 +441,8 @@
 
 <div class="card">
   <h3>🎯 Monthly Profit Goal</h3>
-  <input type="number" id="profitGoalInput" placeholder="Set your goal (coins)">
+  <label class="input-label" for="profitGoalInput">Set your goal (coins)</label>
+  <input type="number" id="profitGoalInput" class="fancy-input" min="1" placeholder="Set your goal (coins)">
   <button id="setGoalBtn">Save Goal</button>
   <p id="goalStatus">Current Goal: -</p>
   <div id="goalProgressWrapper">
@@ -908,12 +938,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
