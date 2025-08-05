@@ -9,7 +9,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
   <style>
     body {
       font-family: 'Rubik', sans-serif;
@@ -25,11 +24,6 @@
       border-radius: 12px;
       overflow: hidden;
       margin-top: 10px;
-    }
-    #gr{
-      width:16px;
-      border-radius:15px;
-      height:16px;
     }
     #goalProgress {
       height: 100%;
@@ -61,11 +55,12 @@
       padding: 10px 0;
       border-bottom: 1px solid #333;
     }
-    input {
+    input, select {
       margin: 5px;
       padding: 8px;
       border: none;
       border-radius: 4px;
+      font-size: 1em;
     }
     button {
       background: linear-gradient(145deg, #00ff88, #00c96d);
@@ -200,7 +195,6 @@
       font-size: 1.1em;
       color: #00ff88;
     }
-    /* Added a spinner for loading state */
     .spinner {
       border: 4px solid #222;
       border-top: 4px solid #00ff88;
@@ -214,6 +208,86 @@
     @keyframes spin {
       0% { transform: rotate(0deg);}
       100% { transform: rotate(360deg);}
+    }
+    /* Custom select styling */
+    #selectWrapper {
+      position: relative;
+      display: inline-block;
+      width: 220px;
+      vertical-align: middle;
+      margin-bottom: 8px;
+    }
+    #playerRarity {
+      appearance: none;
+      background: linear-gradient(90deg, #232323, #333);
+      color: #00ff88;
+      border: 1px solid #00ff88;
+      padding: 10px 40px 10px 16px;
+      border-radius: 8px;
+      font-size: 1em;
+      font-family: 'Rubik', sans-serif;
+      font-weight: 500;
+      transition: box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(0,255,136,0.1);
+      position: relative;
+    }
+    #playerRarity:focus {
+      outline: none;
+      box-shadow: 0 0 10px #00ff8855;
+      border-color: #00ff88;
+    }
+    #selectWrapper:after {
+      content: "▼";
+      position: absolute;
+      right: 18px;
+      top: 16px;
+      color: #00ff88;
+      pointer-events: none;
+      font-size: 1em;
+    }
+    #playerRarity option[value*="gold"] { color: gold; }
+    #playerRarity option[value*="silver"] { color: #bfc1c2; }
+    #playerRarity option[value*="bronze"] { color: #cd7f32; }
+    #playerRarity option[value*="tots"], #playerRarity option[value*="toty"],
+    #playerRarity option[value*="FBD"], #playerRarity option[value*="FFS"],
+    #playerRarity option[value*="FUTTIES"], #playerRarity option[value*="totyH"] { color: #00ff88; }
+    @media (max-width: 700px) {
+      .highlight-card { min-width: 120px; padding: 8px; }
+      #selectWrapper { width: 100%; }
+      #playerRarity { width: 100%; }
+      #comingSoonCard { flex-direction: column; text-align: center; padding: 18px 8px; }
+      #comingSoonCard > div:first-child { font-size: 2em; }
+      #comingSoonCard h2 { font-size: 1.2em; }
+    }
+    /* Coming soon card */
+    @keyframes hypePop {
+      0% {transform: scale(1);}
+      100% {transform: scale(1.13);}
+    }
+    #comingSoonCard {
+      background: linear-gradient(120deg, #222, #00ff88 70%, #fff 100%);
+      color: #222;
+      border-left: 8px solid #00ff88;
+      margin: 30px 0 10px 0;
+      box-shadow: 0 8px 32px rgba(0,255,136,0.2);
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 32px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    #comingSoonCard::after {
+      content: "";
+      position: absolute;
+      right: -50px;
+      top: -50px;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, #00ff88 0%, #fff0 70%);
+      opacity: 0.35;
+      z-index: 0;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -257,37 +331,72 @@
   <input id="buy" type="number" placeholder="Buy Price">
   <input id="sell" type="number" placeholder="Sell Price">
   <label for="playerRarity">Player Rarity:</label>
-  <select id="playerRarity">
-    <option value="gold_rare">Gold Rare</option>
-    <option value="gold_common">Gold Common</option>
-    <option value="silver_rare">Silver Rare</option>
-    <option value="silver_common">Silver Common</option>
-    <option value="bronze_rare">Bronze Rare</option>
-    <option value="bronze_common">Bronze Common</option>
-    <option value="tots">TOTS</option>
-    <option value="toty">TOTY</option>
-    <option value="FBD">FUT BIRTHDAY</option>
-    <option value="FFS">FUT FANTASY</option>
-    <option value="FUTTIES">FUTTIES</option>
-    <option value="totyH">TOTY H</option>
-    <option disabled>──────────</option>
-    <option value="coming_soon" disabled>Coming Soon 🔒</option>
-  </select>
-
+  <div id="selectWrapper">
+    <select id="playerRarity">
+      <optgroup label="Gold">
+        <option value="gold_rare">Gold Rare 🟨</option>
+        <option value="gold_common">Gold Common 🟨</option>
+      </optgroup>
+      <optgroup label="Silver">
+        <option value="silver_rare">Silver Rare 🪙</option>
+        <option value="silver_common">Silver Common 🪙</option>
+      </optgroup>
+      <optgroup label="Bronze">
+        <option value="bronze_rare">Bronze Rare 🟫</option>
+        <option value="bronze_common">Bronze Common 🟫</option>
+      </optgroup>
+      <optgroup label="Special">
+        <option value="tots">TOTS 🌟</option>
+        <option value="toty">TOTY 🌟</option>
+        <option value="FBD">FUT BIRTHDAY 🎉</option>
+        <option value="FFS">FUT FANTASY ✨</option>
+        <option value="FUTTIES">FUTTIES 🎀</option>
+        <option value="totyH">TOTY H 🏆</option>
+      </optgroup>
+    </select>
+  </div>
   <button id="addBtn">Add Trade</button>
-
   <p id="streakDisplay">Streaks loading... <span class="spinner"></span></p>
   <input type="text" id="searchInput" placeholder="Search player name..." style="margin-bottom: 10px; padding: 6px; width: 100%; max-width: 400px;">
   <div id="stats"></div>
   <table id="tradeTable">
     <thead>
-      <tr><th>Player</th><th>Rarity</th><th>Rating</th><th>Buy</th><th>Sell</th><th>Profit</th><th>Note</th><th>Action</th></tr>
+      <tr>
+        <th>Player</th>
+        <th>Rarity</th>
+        <th>Rating</th>
+        <th>Buy</th>
+        <th>Sell</th>
+        <th>Profit</th>
+        <th>Note</th>
+        <th>Action</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
 </div>
+
+<!-- HYPE CARD FOR COMING SOON RARITY FEATURE -->
+<div id="comingSoonCard" class="card">
+  <div style="font-size:3em; flex-shrink:0; animation: hypePop 1.4s infinite alternate;">
+    🔥
+  </div>
+  <div>
+    <h2 style="font-family:'Rubik',sans-serif; font-weight:900; font-size:2em; margin:0 0 10px 0; color:#00c96d; letter-spacing:1px;">
+      New Rarity Tier Coming Soon!
+    </h2>
+    <p style="font-size:1.13em; font-weight:500; margin:0 0 10px 0;">
+      Get ready for <span style="background:#fff176; color:#222; border-radius:5px; padding:3px 8px;">EXCLUSIVE</span> cards and powerful new players!
+      <br>
+      Stay tuned, something <b style="color:#e74c3c;">BIG</b> is arriving in FUT!
+    </p>
+    <span style="display:inline-block; background:#fff3e0; color:#e67e22; font-weight:700; border-radius:5px; padding:4px 10px; box-shadow: 0 2px 8px rgba(255,200,0,0.08);">
+      🚀 Unlock soon!
+    </span>
+  </div>
+</div>
+
 <div id="analyticsSection" class="card" style="display: none;">
-  <!-- Everything from "Add Trade" to Chart -->
   <h2>📈 Profit Chart</h2>
   <canvas id="profitChart" width="400" height="200"></canvas>
   <h2>📊 Monthly Profit Analytics</h2>
@@ -309,7 +418,6 @@
 </div>
 
 <script>
-  // ---- Init Firebase ----
   const firebaseConfig = {
     apiKey: "AIzaSyBH9OtMF64mpkrWCHWH4fUr7FzELGlqiD8",
     authDomain: "mysterioustradertool.firebaseapp.com",
@@ -322,7 +430,6 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // ---- Globals ----
   let trades = [];
   let userId = null;
   let chart;
@@ -331,10 +438,10 @@
 
   function formatRarity(rarity) {
     if (!rarity) return "-";
-    return rarity.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase());
+    let formatted = rarity.replace("_", " ");
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   }
 
-  // ---- Helper Functions ----
   function calcProfit(buy, sell) {
     return Math.round(sell * 0.95 - buy);
   }
@@ -388,14 +495,12 @@
       updateHighlights();
     }
 
-    // Attach Delete Button Events
     document.querySelectorAll(".deleteBtn").forEach(btn => {
       btn.onclick = () => {
         const idx = parseInt(btn.dataset.index);
         if (list === trades) {
           trades.splice(idx, 1);
         } else {
-          // For filtered view, remove the correct trade from original
           const actualTradeIndex = trades.indexOf(list[idx]);
           if (actualTradeIndex > -1) trades.splice(actualTradeIndex, 1);
         }
@@ -409,7 +514,6 @@
       };
     });
 
-    // Attach Modify Button Events
     document.querySelectorAll(".modifyBtn").forEach(btn => {
       btn.onclick = () => {
         const idx = parseInt(btn.dataset.index);
@@ -564,7 +668,6 @@
         const data = doc.data();
         trades = (data.trades || []).map(t => ({
           ...t,
-          // Ensure all trade objects have the rarity property
           rarity: t.rarity || "gold_rare"
         }));
         profitGoal = data.profitGoal || null;
@@ -793,7 +896,6 @@
     `;
   }
 
-  // ---- Initial UI update for not-logged-in users ----
   updateTable();
   updateChart();
   updateMonthlyChart();
