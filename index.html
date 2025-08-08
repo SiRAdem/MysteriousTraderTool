@@ -10,7 +10,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <style>
-    /* --- original styles preserved --- */
     body {
       font-family: 'Rubik', sans-serif;
       background: linear-gradient(145deg, #0f0f0f, #1f1f1f);
@@ -142,6 +141,36 @@
     #extraControls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
     #toast { position: fixed; right: 20px; bottom: 20px; background: #111; color:#fff; padding:12px 16px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.6); display:none; }
     #estCoins { color:#fff; font-weight:800; }
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #222;
+      color: #00ff88;
+      border: 2px solid #00ff88;
+      border-radius: 50%;
+      padding: 8px 12px;
+      font-size: 1.3em;
+      cursor: pointer;
+      z-index: 999;
+    }
+    .price-up { background: #d4ffdf !important; color: #2ecc71 !important; transition: background .3s; }
+    .price-down { background: #ffd4d4 !important; color: #e74c3c !important; transition: background .3s; }
+    .badge { display:inline-block; margin:2px 4px; padding:4px 10px; border-radius:6px; background:#333; color:#fff; font-weight:600;}
+    .badge.unlocked { background:#00ff88; color:#222;}
+    .badge.locked { background:#aaa;}
+    .light-theme {
+      background: linear-gradient(145deg, #fdf6f0, #eafff3) !important;
+      color: #222 !important;
+    }
+    .light-theme h1 { background: #ecfff3 !important; color: #00c96d !important; }
+    .light-theme .card,
+    .light-theme .highlight-card { background: #f4fff8 !important; color: #222 !important; }
+    .light-theme #tradeTable th, .light-theme #tradeTable td { border: 1px solid #bbb !important; color: #222 !important; }
+    .light-theme .fancy-input, .light-theme .fancy-select { background: #fff !important; color: #222 !important; border-color: #00c96d !important; }
+    .light-theme #goalProgressWrapper { background: #eee; }
+    .light-theme #goalProgress { color: #222; }
+    .light-theme .theme-toggle { background: #eee; color: #00c96d; border-color: #00c96d; }
   </style>
 </head>
 <body>
@@ -214,8 +243,10 @@
   </div>
   <button id="addBtn">Add Trade</button>
   <p id="streakDisplay">Streaks loading... <span class="spinner"></span></p>
-
-  <!-- EXTRA CONTROLS (added, non-structural) -->
+  <div id="stats-section">
+    <div id="stats"></div>
+    <div id="loss-recovery"></div>
+  </div>
   <div id="extraControls">
     <input id="searchInput" type="text" class="fancy-input" placeholder="Search player name..." style="max-width:360px;">
     <select id="rarityFilter" class="fancy-select" style="max-width:220px;">
@@ -228,8 +259,6 @@
     <input id="minRating" class="fancy-input" type="number" min="0" max="99" placeholder="min rating" style="max-width:120px;">
     <input id="maxRating" class="fancy-input" type="number" min="0" max="99" placeholder="max rating" style="max-width:120px;">
   </div>
-
-  <div id="stats"></div>
   <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:10px;">
     <button id="exportCsvBtn">Export CSV</button>
     <div>
@@ -241,7 +270,6 @@
       <div>Estimated coins now: <span id="estCoins">-</span></div>
     </div>
   </div>
-
   <table id="tradeTable">
     <thead>
       <tr>
@@ -288,11 +316,8 @@
   <p id="goalStatus">Current Goal: -</p>
   <div id="goalProgressWrapper"><div id="goalProgress">0%</div></div>
 </div>
-
 <div id="toast"></div>
-
 <script>
-  // --- existing firebase config & initialization (unchanged) ---
   const firebaseConfig = {
     apiKey: "AIzaSyBH9OtMF64mpkrWCHWH4fUr7FzELGlqiD8",
     authDomain: "mysterioustradertool.firebaseapp.com",
@@ -305,15 +330,15 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // --- app state ---
   let trades = [];
   let userId = null;
-  let chart;
+  let chart, monthlyChart;
   let profitGoal = null;
   let goalReached = false;
   let achievements = { firstTrade:false, tenTrades:false, bigProfit:false, streakFive:false, goalMaster:false };
+  let bestStreak = parseInt(localStorage.getItem('bestStreak') || 0);
+  let lossRecovery = null;
 
-  // small util: relative time
   function timeAgo(iso) {
     if (!iso) return '-';
     const diff = Date.now() - new Date(iso).getTime();
@@ -337,7 +362,6 @@
 
   function calcProfit(buy, sell) { return Math.round(sell * 0.95 - buy); }
 
-  // update stats + animate total profit
   function animateValue(el, start, end, duration=600) {
     const range = end - start;
     let startTime = null;
@@ -350,31 +374,6 @@
     window.requestAnimationFrame(step);
   }
 
-  function updateStatsUI() {
-    const totalProfit = trades.reduce((s,t)=> s + calcProfit(t.buy, t.sell), 0);
-    const avg = trades.length ? Math.round(totalProfit / trades.length) : 0;
-    const statsEl = document.getElementById('stats');
-    const prev = parseInt(statsEl.dataset.total || '0');
-    statsEl.dataset.total = totalProfit;
-    animateValue(statsEl, prev, totalProfit);
-    const winRate = trades.length ? Math.round(100 * trades.filter(t => calcProfit(t.buy,t.sell) > 0).length / trades.length) : 0;
-    const streakText = document.getElementById('streakDisplay');
-    streakText.textContent = `${streakText.textContent.split('|')[0].trim()} | Win rate: ${winRate}%`;
-  }
-
-  // CSV export
-  function exportCsv() {
-    if (!trades.length) return showToast('No trades to export');
-    const headers = ['player','rarity','rating','buy','sell','profit','date'];
-    const rows = trades.map(t => [t.player, t.rarity, t.rating||'', t.buy, t.sell, calcProfit(t.buy,t.sell), t.date||'']);
-    const csv = [headers.join(','), ...rows.map(r => r.map(cell => '"'+String(cell).replace(/"/g,'""')+'"').join(','))].join('\n');
-    const blob = new Blob([csv], {type: 'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'trades.csv'; a.click(); URL.revokeObjectURL(url);
-    showToast('Exported trades.csv');
-  }
-
-  // small helper: parse rarity group
   function rarityGroup(r) {
     if (!r) return 'other';
     if (r.includes('gold')) return 'gold';
@@ -383,7 +382,7 @@
     return 'special';
   }
 
-  // render table rows and attach events
+  // Table rendering with IDs for live price
   function updateTable(list = trades) {
     const tbody = document.querySelector('#tradeTable tbody');
     tbody.innerHTML = '';
@@ -392,6 +391,7 @@
       const profit = calcProfit(t.buy,t.sell);
       totalProfit += profit;
       const tr = document.createElement('tr');
+      tr.id = `trade-${i}`;
       if (profit < 0) tr.classList.add('loss');
       if (profit >= 10000) tr.classList.add('big-win');
       tr.innerHTML = `
@@ -399,7 +399,7 @@
         <td>${formatRarity(t.rarity)}</td>
         <td>${t.rating||'-'}</td>
         <td>${t.buy}</td>
-        <td>${t.sell}</td>
+        <td class="sell-price">${t.sell}</td>
         <td style="color:${profit>=0?'#2ecc71':'#e74c3c'}; font-weight:${Math.abs(profit)>=10000?'bold':'normal'}">${profit}</td>
         <td>${getNote(profit)}</td>
         <td>${t.futbinPrice?`Market: <b>${t.futbinPrice} 🪙</b>`:'Market: <span style="color:#999">N/A</span>'}</td>
@@ -412,11 +412,10 @@
     });
     updateGoalProgress(totalProfit);
     updateHighlights();
-    updateChart();
-    updateMonthlyChart();
+    updateChart(list);
+    updateMonthlyChart(list);
     updateSuggestionsUI();
     updateAchievements();
-    // attach events
     document.querySelectorAll('.deleteBtn').forEach(btn => btn.onclick = () => {
       const idx = parseInt(btn.dataset.index);
       trades.splice(idx,1);
@@ -431,26 +430,38 @@
       document.getElementById('playerRarity').value = trade.rarity||'gold_rare';
       const addBtn = document.getElementById('addBtn'); addBtn.textContent = 'Save Changes'; addBtn.dataset.editingIndex = idx;
     });
-    // update stats text
     const statsEl = document.getElementById('stats');
     statsEl.textContent = `Total Trades: ${trades.length} | Total Profit: ${totalProfit} coins | Avg Profit: ${trades.length?Math.round(totalProfit/trades.length):0} coins`;
-    // animated total profit update (separated)
-    // estimated coins
+    statsEl.dataset.total = totalProfit;
     const start = parseInt(localStorage.getItem('startingCoins')||'0');
     document.getElementById('estCoins').textContent = start + totalProfit;
   }
 
+  function formatRarity(rarity) {
+    if (!rarity) return '-';
+    let formatted = rarity.replace('_',' ');
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  }
+  function getNote(profit) {
+    if (profit >= 10000) return "🔥 Great";
+    if (profit >= 0) return "👍 Not Bad";
+    return "💀 Messed Up";
+  }
   function updateHighlights() {
     if (!trades.length) return;
     let best = trades[0], worst = trades[0];
-    trades.forEach(t => { if (calcProfit(t.buy,t.sell) > calcProfit(best.buy,best.sell)) best = t; if (calcProfit(t.buy,t.sell) < calcProfit(worst.buy,worst.sell)) worst = t; });
-    document.getElementById('bestPlayer').textContent = best.player; document.getElementById('bestProfit').textContent = `+${calcProfit(best.buy,best.sell)} 🪙`;
+    trades.forEach(t => {
+      if (calcProfit(t.buy,t.sell) > calcProfit(best.buy,best.sell)) best = t;
+      if (calcProfit(t.buy,t.sell) < calcProfit(worst.buy,worst.sell)) worst = t;
+    });
+    document.getElementById('bestPlayer').textContent = best.player;
+    document.getElementById('bestProfit').textContent = `+${calcProfit(best.buy,best.sell)} 🪙`;
     document.getElementById('bestDate').textContent = timeAgo(best.date);
-    document.getElementById('worstPlayer').textContent = worst.player; document.getElementById('worstProfit').textContent = `${calcProfit(worst.buy,worst.sell)} 🪙`;
+    document.getElementById('worstPlayer').textContent = worst.player;
+    document.getElementById('worstProfit').textContent = `${calcProfit(worst.buy,worst.sell)} 🪙`;
     document.getElementById('worstDate').textContent = timeAgo(worst.date);
   }
 
-  // filtering and advanced search
   function applyFilters() {
     const q = document.getElementById('searchInput').value.trim().toLowerCase();
     const rarity = document.getElementById('rarityFilter').value;
@@ -468,17 +479,14 @@
     updateTable(filtered);
   }
 
-  // sorting
   let currentSort = {col:null, dir:1};
   document.querySelectorAll('#tradeTable thead th').forEach(th => {
     th.style.cursor = 'pointer';
     th.addEventListener('click', () => {
       const col = th.dataset.col; if (!col) return;
       if (currentSort.col === col) currentSort.dir *= -1; else { currentSort.col = col; currentSort.dir = 1; }
-      // remove indicators
       document.querySelectorAll('#tradeTable thead th').forEach(x => x.classList.remove('sorted-asc','sorted-desc'));
       th.classList.add(currentSort.dir === 1 ? 'sorted-asc':'sorted-desc');
-      // do sort
       const sorted = [...trades].sort((a,b)=> {
         let va = (col==='profit') ? calcProfit(a.buy,a.sell) : (a[col]===undefined? '': (typeof a[col] === 'string'? a[col].toLowerCase(): a[col]));
         let vb = (col==='profit') ? calcProfit(b.buy,b.sell) : (b[col]===undefined? '': (typeof b[col] === 'string'? b[col].toLowerCase(): b[col]));
@@ -488,28 +496,36 @@
     });
   });
 
-  // CSV export button
   document.getElementById('exportCsvBtn').addEventListener('click', exportCsv);
 
-  // starting coins
+  function exportCsv() {
+    if (!trades.length) return showToast('No trades to export');
+    const headers = ['player','rarity','rating','buy','sell','profit','date'];
+    const rows = trades.map(t => [t.player, t.rarity, t.rating||'', t.buy, t.sell, calcProfit(t.buy,t.sell), t.date||'']);
+    const csv = [headers.join(','), ...rows.map(r => r.map(cell => '"'+String(cell).replace(/"/g,'""')+'"').join(','))].join('\n');
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'trades.csv'; a.click(); URL.revokeObjectURL(url);
+    showToast('Exported trades.csv');
+  }
+
   document.getElementById('saveStartingBtn').addEventListener('click', () => {
     const val = parseInt(document.getElementById('startingCoins').value) || 0; localStorage.setItem('startingCoins', String(val)); showToast('Starting coins saved'); updateTable();
   });
-  // set stored starting value on load
   document.getElementById('startingCoins').value = localStorage.getItem('startingCoins') || '';
 
-  // wiring up search inputs
   document.getElementById('searchInput').addEventListener('input', applyFilters);
   document.getElementById('rarityFilter').addEventListener('change', applyFilters);
   document.getElementById('minRating').addEventListener('input', applyFilters);
   document.getElementById('maxRating').addEventListener('input', applyFilters);
 
-  // --- rest of the original code (slightly adapted to call new helpers) ---
+  // --- FUTBIN stub and chart functions ---
   const futbinMap = { "Kylian Mbappé":23, "Cristiano Ronaldo":20801, "Lionel Messi":158023, "Erling Haaland":241462 };
-  function formatRarity(rarity) { if (!rarity) return '-'; let formatted = rarity.replace('_',' '); return formatted.charAt(0).toUpperCase() + formatted.slice(1); }
-  function getNote(profit) { if (profit >= 10000) return "🔥 Great"; if (profit >= 0) return "👍 Not Bad"; return "💀 Messed Up"; }
-
-  async function getFutbinPrice(playerId) { try { const url = `https://www.futbin.com/24/player/${playerId}`; const resp = await fetch(url); const text = await resp.text(); const priceMatch = text.match(/<span class="ps4_color">(.*?)<\/span>/); if(priceMatch) return priceMatch[1].replace(/,/g,'').trim(); } catch(e){ return null; } return null; }
+  async function getFutbinPrice(playerId) {
+    // This is a stub. Actual scraping from futbin.com is unreliable due to CORS.
+    // Replace with your own backend proxy if needed!
+    return null;
+  }
   async function getTradePlayerPrice(playerName) { const playerId = futbinMap[playerName]; if (!playerId) return null; return await getFutbinPrice(playerId); }
 
   function updateChart(list = trades) {
@@ -517,21 +533,26 @@
     const labels = list.map((t,i)=>`${i+1}. ${t.player}`);
     const profits = list.map(t=>calcProfit(t.buy,t.sell));
     if (chart) chart.destroy();
-    chart = new Chart(ctx, { type:'line', data:{ labels, datasets:[{ label:'Profit per Trade', data:profits, borderColor:'#00ff88', backgroundColor:'rgba(0,255,136,0.1)', pointBackgroundColor:profits.map(p=>p>=0? '#2ecc71':'#e74c3c'), tension:0.3 }] }, options:{ scales:{ y:{ beginAtZero:true, ticks:{ callback: val => val + ' 🪙' } } }, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx => `Profit: ${ctx.parsed.y} coins` } } } } });
+    chart = new Chart(ctx, { type:'line', data:{ labels, datasets:[{ label:'Profit per Trade', data:profits, borderColor:'#00ff88', backgroundColor:'rgba(0,255,136,0.1)', pointBackgroundColor:profits.map(p=>p>=0?'#00ff88':'#e74c3c') }] }, options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} } });
   }
 
   function updateMonthlyChart(list = trades) {
     const ctx = document.getElementById('monthlyChart').getContext('2d');
     const monthlyData = {};
-    list.forEach(t=>{ const profit = calcProfit(t.buy,t.sell); const date = t.date ? new Date(t.date) : new Date(); const key = date.toLocaleString('default',{month:'short', year:'numeric'}); if(!monthlyData[key]) monthlyData[key] = 0; monthlyData[key] += profit; });
+    list.forEach(t=>{
+      const profit = calcProfit(t.buy,t.sell);
+      const date = t.date ? new Date(t.date) : new Date();
+      const key = date.toLocaleString('default',{month:'short', year:'numeric'});
+      if(!monthlyData[key]) monthlyData[key]=0;
+      monthlyData[key]+=profit;
+    });
     const labels = Object.keys(monthlyData); const data = Object.values(monthlyData);
-    if (window.monthlyChart && typeof window.monthlyChart.destroy === 'function') window.monthlyChart.destroy();
-    window.monthlyChart = new Chart(ctx, { type:'bar', data:{ labels, datasets:[{ label:'Monthly Profit', data, backgroundColor:data.map(p=>p>=0? '#00ff88':'#e74c3c'), borderRadius:4 }] }, options:{ scales:{ y:{ beginAtZero:true, ticks:{ callback: val => val + ' 🪙' } } }, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx => `Profit: ${ctx.parsed.y} coins` } } } } });
+    if (monthlyChart && typeof monthlyChart.destroy === 'function') monthlyChart.destroy();
+    monthlyChart = new Chart(ctx, { type:'bar', data:{ labels, datasets:[{ label:'Monthly Profit', data, backgroundColor:data.map(p=>p>=0? '#00ff88':'#e74c3c'), borderRadius:4 }] }, options:{ scales:{y:{beginAtZero:true}} } });
   }
 
   function saveTradesToDB() { if (!userId) return; db.collection('users').doc(userId).set({ trades, profitGoal, achievements }).catch(err=>console.warn('Save failed',err)); }
-
-  function loadTradesFromDB() { if (!userId) return; db.collection('users').doc(userId).get().then(doc=>{ if (doc.exists) { const data = doc.data(); trades = (data.trades||[]).map(t=>({ ...t, rarity:t.rarity||'gold_rare'})); profitGoal = data.profitGoal||null; achievements = data.achievements||achievements; document.getElementById('goalStatus').textContent = `Current Goal: ${profitGoal? profitGoal + ' coins':'-'}`; } else trades = []; updateTable(); updateChart(); updateMonthlyChart(); updateSuggestionsUI(); updateStreaks(); updateBadges(); }); }
+  function loadTradesFromDB() { if (!userId) return; db.collection('users').doc(userId).get().then(doc=>{ if (doc.exists) { const data = doc.data(); trades = (data.trades||[]).map(t=>({ ...t, rarity:t.rarity||'gold_rare' })); profitGoal = data.profitGoal||null; achievements = data.achievements||achievements; updateTable(); } else { trades=[]; updateTable(); } }); }
 
   document.getElementById('addBtn').onclick = async () => {
     const player = document.getElementById('player').value.trim();
@@ -542,27 +563,30 @@
     if (!player || isNaN(buy) || isNaN(sell)) return alert('Please fill all fields');
     const addBtn = document.getElementById('addBtn'); const editingIndex = addBtn.dataset.editingIndex;
     let futbinPrice = null; if (futbinMap[player]) futbinPrice = await getTradePlayerPrice(player);
+    const tradeObj = { player, buy, sell, rating, rarity, futbinPrice, date: new Date().toISOString() };
+    // Add playerId for live price fetching if available
+    if (futbinMap[player]) tradeObj.playerId = futbinMap[player];
     if (editingIndex !== undefined) {
-      trades[editingIndex] = { player, buy, sell, rating, rarity, futbinPrice, date: trades[editingIndex].date || new Date().toISOString() };
+      trades[editingIndex] = { ...tradeObj, date: trades[editingIndex].date || tradeObj.date };
       delete addBtn.dataset.editingIndex; addBtn.textContent = 'Add Trade';
     } else {
-      trades.push({ player, buy, sell, rating, rarity, futbinPrice, date: new Date().toISOString() });
+      trades.push(tradeObj);
     }
-    saveTradesToDB(); updateTable(); updateChart(); updateMonthlyChart(); updateSuggestionsUI(); updateStreaks(); updateBadges();
-    document.getElementById('player').value = ''; document.getElementById('buy').value = ''; document.getElementById('sell').value = ''; document.getElementById('playerRating').value = ''; document.getElementById('playerRarity').value = 'gold_rare';
+    saveTradesToDB(); updateTable(); updateStreaks(); updateBadges();
+    document.getElementById('player').value = ''; document.getElementById('buy').value = ''; document.getElementById('sell').value = ''; document.getElementById('playerRating').value = '';
     showToast('Trade saved');
   };
 
   document.getElementById('setGoalBtn').onclick = () => {
     const input = parseInt(document.getElementById('profitGoalInput').value);
     if (isNaN(input) || input <= 0) return alert('Enter a valid positive number.');
-    profitGoal = input; document.getElementById('goalStatus').textContent = `Current Goal: ${profitGoal} coins`; saveTradesToDB(); updateTable(); updateGoalProgress(trades.reduce((sum,t)=> sum + calcProfit(t.buy,t.sell), 0));
+    profitGoal = input; document.getElementById('goalStatus').textContent = `Current Goal: ${profitGoal} coins`; saveTradesToDB(); updateTable(); updateGoalProgress(trades.reduce((sum,t)=> sum + calcProfit(t.buy,t.sell),0));
   };
 
-  document.getElementById('loginBtn').addEventListener('click', ()=>{ const provider = new firebase.auth.GoogleAuthProvider(); auth.signInWithPopup(provider).catch(error=> alert('Login failed: '+error.message)); });
+  document.getElementById('loginBtn').addEventListener('click', ()=>{ const provider = new firebase.auth.GoogleAuthProvider(); auth.signInWithPopup(provider).catch(error=> alert('Login failed: '+error)); });
   document.getElementById('logoutBtn').addEventListener('click', ()=> auth.signOut());
 
-  auth.onAuthStateChanged(user=>{ if (user) { userId = user.uid; document.getElementById('loginBtn').style.display = 'none'; document.getElementById('logoutBtn').style.display = 'inline-block'; document.getElementById('user-email').textContent = user.email; loadTradesFromDB(); } else { userId=null; trades=[]; updateTable(); updateChart(); updateMonthlyChart(); updateSuggestionsUI(); updateStreaks(); updateBadges(); document.getElementById('user-email').textContent=''; document.getElementById('loginBtn').style.display='inline-block'; document.getElementById('logoutBtn').style.display='none'; } });
+  auth.onAuthStateChanged(user=>{ if (user) { userId = user.uid; document.getElementById('loginBtn').style.display = 'none'; document.getElementById('logoutBtn').style.display = 'inline-block'; document.getElementById('user-email').textContent = user.email; loadTradesFromDB(); } else { userId = null; document.getElementById('loginBtn').style.display = ''; document.getElementById('logoutBtn').style.display = 'none'; document.getElementById('user-email').textContent = ''; trades=[]; updateTable(); } });
 
   document.getElementById('showTradeBtn').onclick = ()=> switchTab(true); document.getElementById('showAnalyticsBtn').onclick = ()=> switchTab(false);
 
@@ -575,95 +599,118 @@
     else if (pct < 100) goalReached = false;
   }
 
-  function showConfetti() { const confetti = document.createElement('div'); confetti.style.position='fixed'; confetti.style.left='50%'; confetti.style.top='25%'; confetti.style.transform='translate(-50%,-50%)'; confetti.style.fontSize='3em'; confetti.style.pointerEvents='none'; confetti.textContent='🎉🎊'; confetti.style.animation='confettiPop 1.5s ease'; document.body.appendChild(confetti); setTimeout(()=>confetti.remove(),1500); }
+  function showConfetti() {
+    const confetti = document.createElement('div');
+    confetti.style.position='fixed'; confetti.style.left='50%'; confetti.style.top='25%'; confetti.style.transform='translate(-50%,-50%)'; confetti.style.fontSize='4em'; confetti.textContent='🎉';
+    confetti.style.zIndex=1000; document.body.appendChild(confetti);
+    setTimeout(()=>{confetti.remove();},1800);
+  }
 
   function updateSuggestionsUI() {
     const el = document.getElementById('suggestionsList'); if (!trades.length) { el.innerHTML = '<em>Add some trades to see smart suggestions!</em>'; return; }
     let maxProfitTrade = trades.reduce((a,b)=> calcProfit(a.buy,a.sell) > calcProfit(b.buy,b.sell) ? a : b, trades[0]);
     let minProfitTrade = trades.reduce((a,b)=> calcProfit(a.buy,a.sell) < calcProfit(b.buy,b.sell) ? a : b, trades[0]);
     let avgProfit = trades.length ? Math.round(trades.reduce((s,t)=> s + calcProfit(t.buy,t.sell),0)/trades.length) : 0;
-    el.innerHTML = `<div><b>Best trade:</b> ${maxProfitTrade.player} (+${calcProfit(maxProfitTrade.buy,maxProfitTrade.sell)}🪙)<br><b>Worst trade:</b> ${minProfitTrade.player} (${calcProfit(minProfitTrade.buy,minProfitTrade.sell)}🪙)<br><b>Average profit:</b> ${avgProfit}🪙<br><b>Tip:</b> Try to focus on ${maxProfitTrade.player} type deals!<br></div>`;
+    el.innerHTML = `<div><b>Best trade:</b> ${maxProfitTrade.player} (+${calcProfit(maxProfitTrade.buy,maxProfitTrade.sell)}🪙)<br><b>Worst trade:</b> ${minProfitTrade.player} (${calcProfit(minProfitTrade.buy,minProfitTrade.sell)}🪙)<br><b>Average profit:</b> ${avgProfit}🪙</div>`;
   }
 
-  function updateAchievements() { achievements.firstTrade = trades.length >= 1; achievements.tenTrades = trades.length >= 10; achievements.bigProfit = trades.some(t=> calcProfit(t.buy,t.sell) >= 10000);
-    let streak=0, maxStreak=0; trades.forEach(t=>{ if (calcProfit(t.buy,t.sell) > 0) { streak +=1; maxStreak = Math.max(maxStreak, streak); } else streak =0; }); achievements.streakFive = maxStreak >=5; updateBadges(); saveTradesToDB(); }
+  function updateAchievements() {
+    achievements.firstTrade = trades.length >= 1;
+    achievements.tenTrades = trades.length >= 10;
+    achievements.bigProfit = trades.some(t=> calcProfit(t.buy,t.sell) >= 10000);
+    let streak=0, maxStreak=0; trades.forEach(t=>{ if (calcProfit(t.buy,t.sell) > 0) { streak +=1; maxStreak = Math.max(maxStreak, streak); } else streak =0; }); achievements.streakFive = maxStreak >=5;
+    updateBadges();
+  }
 
-  function updateStreaks() { if (!trades.length) { document.getElementById('streakDisplay').textContent = 'No trades yet!'; return; } let streak=0,maxStreak=0; trades.forEach(t=>{ if (calcProfit(t.buy,t.sell)>0) { streak+=1; maxStreak=Math.max(maxStreak,streak);} else streak=0; }); document.getElementById('streakDisplay').textContent = `Current positive streak: ${streak} | Max streak: ${maxStreak}`; }
+  function updateBadges() {
+    const b = document.getElementById('badges');
+    b.innerHTML = '';
+    b.innerHTML += `<span class="badge ${achievements.firstTrade? 'unlocked':'locked'}">First Trade</span>`;
+    b.innerHTML += `<span class="badge ${achievements.tenTrades? 'unlocked':'locked'}">10 Trades</span>`;
+    b.innerHTML += `<span class="badge ${achievements.bigProfit? 'unlocked':'locked'}">Big Profit</span>`;
+    b.innerHTML += `<span class="badge ${achievements.streakFive? 'unlocked':'locked'}">5 Win Streak</span>`;
+    b.innerHTML += `<span class="badge ${achievements.goalMaster? 'unlocked':'locked'}">Goal Master</span>`;
+  }
 
-  function updateBadges() { const b = document.getElementById('badges'); b.innerHTML = ''; b.innerHTML += `<span class="badge ${achievements.firstTrade? 'unlocked':'locked'}">First Trade</span>`; b.innerHTML += `<span class="badge ${achievements.tenTrades? 'unlocked':'locked'}">10 Trades</span>`; b.innerHTML += `<span class="badge ${achievements.bigProfit? 'unlocked':'locked'}">Big Profit (+10k)</span>`; b.innerHTML += `<span class="badge ${achievements.streakFive? 'unlocked':'locked'}">5 Trade Streak</span>`; b.innerHTML += `<span class="badge ${achievements.goalMaster? 'unlocked':'locked'}">Goal Master</span>`; }
-
-  // local UI init and helpers
-  document.getElementById('searchInput').addEventListener('keydown', e=>{ if (e.key==='Enter') applyFilters(); });
-
-  // initial table/chart/badges
-  updateTable(); updateChart(); updateMonthlyChart(); updateSuggestionsUI(); updateStreaks(); updateBadges();
-
-  // tab switcher
-  window.onload = function() { let showTrade = localStorage.getItem('showTradeTab') !== 'false'; switchTab(showTrade); };
-  function switchTab(showTrade) { document.getElementById('tradeSection').style.display = showTrade ? 'block' : 'none'; document.getElementById('analyticsSection').style.display = showTrade ? 'none' : 'block'; document.getElementById('showTradeBtn').classList.toggle('active', showTrade); document.getElementById('showAnalyticsBtn').classList.toggle('active', !showTrade); localStorage.setItem('showTradeTab', showTrade); }
-// === 1. Live Prices (FUTNext API) ===
-function fetchLivePrices() {
-    trades.forEach((trade, index) => {
-        fetch(`https://futnext.app/api/player/${trade.playerId}`)
-            .then(res => res.json())
-            .then(data => {
-                let newPrice = data.price;
-                let cell = document.querySelector(`#trade-${index} .sell-price`);
-                let oldPrice = parseInt(cell.innerText);
-                cell.innerText = newPrice;
-                if (newPrice > oldPrice) cell.classList.add('price-up');
-                else if (newPrice < oldPrice) cell.classList.add('price-down');
-                setTimeout(() => cell.classList.remove('price-up', 'price-down'), 1500);
-            });
+  function updateStreaks() {
+    if (!trades.length) { document.getElementById('streakDisplay').textContent = 'No trades yet!'; return; }
+    let streak=0,maxStreak=0;
+    trades.forEach(t=>{
+      if (calcProfit(t.buy,t.sell) > 0) { streak +=1; maxStreak = Math.max(maxStreak, streak); } else streak =0;
     });
-}
-setInterval(fetchLivePrices, 600000); // every 10 min
+    document.getElementById('streakDisplay').textContent = `Current Win Streak: ${streak} | Best Win Streak: ${bestStreak}`;
+    updateStreakChallenge(streak);
+  }
 
-// === 2. Theme Switcher ===
-const themeToggle = document.createElement('button');
-themeToggle.innerText = '🌙/☀️';
-themeToggle.classList.add('theme-toggle');
-themeToggle.onclick = () => {
-    document.body.classList.toggle('light-theme');
-    localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
-};
-document.body.appendChild(themeToggle);
-if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-theme');
-
-// === 3. Streak Challenges ===
-let bestStreak = parseInt(localStorage.getItem('bestStreak') || 0);
-function updateStreakChallenge(currentStreak) {
+  function updateStreakChallenge(currentStreak) {
     if (currentStreak > bestStreak) {
-        bestStreak = currentStreak;
-        localStorage.setItem('bestStreak', bestStreak);
-        if ([5, 10, 20].includes(currentStreak)) showToast(`🔥 Streak Milestone: ${currentStreak} profitable trades in a row!`);
+      bestStreak = currentStreak;
+      localStorage.setItem('bestStreak', bestStreak);
+      if ([5, 10, 20].includes(currentStreak)) showToast(`🔥 Streak Milestone: ${currentStreak} profitable trades in a row!`);
     }
-}
+  }
 
-// === 4. Loss Recovery Tracker ===
-let lossRecovery = null;
-function checkLossRecovery(profit) {
+  // Loss Recovery Tracker
+  function checkLossRecovery(profit) {
     if (profit < 0) {
-        lossRecovery = { remaining: Math.abs(profit), recovered: 0 };
+      lossRecovery = { remaining: Math.abs(profit), recovered: 0 };
     } else if (lossRecovery) {
-        lossRecovery.recovered += profit;
-        if (lossRecovery.recovered >= lossRecovery.remaining) {
-            showToast('✅ Loss fully recovered!');
-            lossRecovery = null;
-        }
+      lossRecovery.recovered += profit;
+      if (lossRecovery.recovered >= lossRecovery.remaining) {
+        showToast('✅ Loss fully recovered!');
+        lossRecovery = null;
+      }
     }
     updateLossRecoveryUI();
-}
-function updateLossRecoveryUI() {
+  }
+  function updateLossRecoveryUI() {
     let el = document.getElementById('loss-recovery');
-    if (!el) {
-        el = document.createElement('div');
-        el.id = 'loss-recovery';
-        document.querySelector('#stats-section').appendChild(el);
-    }
+    if (!el) return;
     el.innerText = lossRecovery ? `Loss Recovery: +${lossRecovery.recovered} / Needed ${lossRecovery.remaining}` : 'No losses to recover.';
-}
+  }
+
+  document.getElementById('searchInput').addEventListener('keydown', e=>{ if (e.key==='Enter') applyFilters(); });
+
+  updateTable(); updateChart(); updateMonthlyChart(); updateSuggestionsUI(); updateStreaks(); updateBadges();
+
+  window.onload = function() { let showTrade = localStorage.getItem('showTradeTab') !== 'false'; switchTab(showTrade); };
+  function switchTab(showTrade) {
+    document.getElementById('tradeSection').style.display = showTrade ? 'block' : 'none';
+    document.getElementById('analyticsSection').style.display = showTrade ? 'none' : 'block';
+    localStorage.setItem('showTradeTab', showTrade ? 'true' : 'false');
+  }
+
+  // === 1. Live Prices (FUTNext API) ===
+  function fetchLivePrices() {
+    trades.forEach((trade, index) => {
+      if (!trade.playerId) return;
+      fetch(`https://futnext.app/api/player/${trade.playerId}`)
+        .then(res => res.json())
+        .then(data => {
+          let newPrice = data.price;
+          let cell = document.querySelector(`#trade-${index} .sell-price`);
+          if (!cell) return;
+          let oldPrice = parseInt(cell.innerText);
+          cell.innerText = newPrice;
+          if (newPrice > oldPrice) cell.classList.add('price-up');
+          else if (newPrice < oldPrice) cell.classList.add('price-down');
+          setTimeout(() => cell.classList.remove('price-up', 'price-down'), 1500);
+        })
+        .catch(()=>{});
+    });
+  }
+  setInterval(fetchLivePrices, 600000); // every 10 min
+
+  // === 2. Theme Switcher ===
+  const themeToggle = document.createElement('button');
+  themeToggle.innerText = '🌙/☀️';
+  themeToggle.classList.add('theme-toggle');
+  themeToggle.onclick = () => {
+    document.body.classList.toggle('light-theme');
+    localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+  };
+  document.body.appendChild(themeToggle);
+  if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-theme');
 </script>
 </body>
 </html>
-
