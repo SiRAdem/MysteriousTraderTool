@@ -601,7 +601,69 @@
   // tab switcher
   window.onload = function() { let showTrade = localStorage.getItem('showTradeTab') !== 'false'; switchTab(showTrade); };
   function switchTab(showTrade) { document.getElementById('tradeSection').style.display = showTrade ? 'block' : 'none'; document.getElementById('analyticsSection').style.display = showTrade ? 'none' : 'block'; document.getElementById('showTradeBtn').classList.toggle('active', showTrade); document.getElementById('showAnalyticsBtn').classList.toggle('active', !showTrade); localStorage.setItem('showTradeTab', showTrade); }
+// === 1. Live Prices (FUTNext API) ===
+function fetchLivePrices() {
+    trades.forEach((trade, index) => {
+        fetch(`https://futnext.app/api/player/${trade.playerId}`)
+            .then(res => res.json())
+            .then(data => {
+                let newPrice = data.price;
+                let cell = document.querySelector(`#trade-${index} .sell-price`);
+                let oldPrice = parseInt(cell.innerText);
+                cell.innerText = newPrice;
+                if (newPrice > oldPrice) cell.classList.add('price-up');
+                else if (newPrice < oldPrice) cell.classList.add('price-down');
+                setTimeout(() => cell.classList.remove('price-up', 'price-down'), 1500);
+            });
+    });
+}
+setInterval(fetchLivePrices, 600000); // every 10 min
 
+// === 2. Theme Switcher ===
+const themeToggle = document.createElement('button');
+themeToggle.innerText = '🌙/☀️';
+themeToggle.classList.add('theme-toggle');
+themeToggle.onclick = () => {
+    document.body.classList.toggle('light-theme');
+    localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+};
+document.body.appendChild(themeToggle);
+if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-theme');
+
+// === 3. Streak Challenges ===
+let bestStreak = parseInt(localStorage.getItem('bestStreak') || 0);
+function updateStreakChallenge(currentStreak) {
+    if (currentStreak > bestStreak) {
+        bestStreak = currentStreak;
+        localStorage.setItem('bestStreak', bestStreak);
+        if ([5, 10, 20].includes(currentStreak)) showToast(`🔥 Streak Milestone: ${currentStreak} profitable trades in a row!`);
+    }
+}
+
+// === 4. Loss Recovery Tracker ===
+let lossRecovery = null;
+function checkLossRecovery(profit) {
+    if (profit < 0) {
+        lossRecovery = { remaining: Math.abs(profit), recovered: 0 };
+    } else if (lossRecovery) {
+        lossRecovery.recovered += profit;
+        if (lossRecovery.recovered >= lossRecovery.remaining) {
+            showToast('✅ Loss fully recovered!');
+            lossRecovery = null;
+        }
+    }
+    updateLossRecoveryUI();
+}
+function updateLossRecoveryUI() {
+    let el = document.getElementById('loss-recovery');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'loss-recovery';
+        document.querySelector('#stats-section').appendChild(el);
+    }
+    el.innerText = lossRecovery ? `Loss Recovery: +${lossRecovery.recovered} / Needed ${lossRecovery.remaining}` : 'No losses to recover.';
+}
 </script>
 </body>
 </html>
+
